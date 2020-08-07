@@ -1,0 +1,11 @@
+
+BW = 1.0
+th = linspace(-90,90,100)
+# Line
+x = 2.0*pi*25.3*sin(th)
+bl = sin(x)/x
+
+figure(1)
+clf()
+plot(th,bl)
+show()
