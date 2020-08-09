@@ -86,9 +86,9 @@
 \section{Sonar Model}
 
 The echo level is
-\[
+\begin{equation}
 EL = SL - 2(TL)+ TS % = 10 \log\left( \frac{I_R}{I_T} \right)
-\]
+\end{equation}
 where SL is the source level, TL is the transmission loss, TS is target strength, $I_R$ is the reflected intensity and $I_T$ is the transmitted intensity.  To start with we use the \verb+laser_retro+ method to provide the reflected intensity.
 
 \section{Beam Pattern Model}
@@ -102,9 +102,9 @@ The background of modeling the beam pattern is covered by the following:
 
 \subsection{Beam Pattern Geometry}
 The geometry of the beam pattern is illustrated in Figure~\ref{f:bpattern}.  Most of the energy in the beam pattern is in the \emph{main lobe} and the center of that lobe is the \emph{main response axis} (MRA), shown as the Main axis in the figure. The angle from the MRA to the \emph{half power point} is $\theta_w$ and the \emph{beam width} (Full angle in the Figure) is twice this value:
-\[
+\begin{equation}
 \theta_{bw}=2 \theta_w
-\]
+\end{equation}
 
 \begin{figure}[hbt!]
   \centering
@@ -113,39 +113,39 @@ The geometry of the beam pattern is illustrated in Figure~\ref{f:bpattern}.  Mos
   \label{f:bpattern}
 \end{figure}
 The beam pattern expresses the echo level as a function $\theta$, the angle relative the the MRA, as
-\[
+\begin{equation}
 EL = \left| G(\theta) \right|^2
-\]
+\end{equation}
 
 \subsection{Line Array Beam Pattern}
 For a line array of length $L$, radiating energy at wavelenth $\lambda$, the beam pattern is that of the \emph{uniform aperature function}.  The radiated power is modeled as a \emph{normalized sinc function}
-\[
+\begin{equation}
 \left| G(L u) \right|^2 =  \left|\mathrm{sinc}(L u)\right|^2 = 
 \begin{cases}
   1 & \text{for} \, \,  Lu = 0 \\
  \left| \frac{\sin(\pi L u)}{\pi L u} \right|^2  & \text{otherwise}
   \end{cases}
-\]
+\end{equation}
 where $u$ is the \emph{electrical angle}
-\[
+\begin{equation}
 u = \frac{\sin(\theta)}{\lambda}.
-\]
+\end{equation}
 We can solve for the half power point by setting
-\[
+\begin{equation}
 G(\theta_w) = \frac{\sin(\pi \frac{L}{\lambda} \sin(\theta_w))}{\pi \frac{L}{\lambda} \sin(\theta_w)} = \frac{1}{\sqrt{2}}.
-\]
+\end{equation}
 For conditions where $L >> \lambda$, which is typical of high-frequency sonar, the half power point is
-\[
+\begin{equation}
 \theta_{w} = 0.442 \frac{\lambda}{L} \,\, \unit[]{rad}.
-\]
+\end{equation}
 When given a beam width, $\theta_{bw} = 2 \theta_w$ we can solve for the length to wavelength ratio
-\[
+\begin{equation}
 \frac{L}{\lambda} = \frac{0.884}{\theta_{bw}} = \frac{0.442}{\theta_w}
-\]
+\end{equation}
 so that the beam pattern is
-\[
+\begin{equation}
 \left| G(\theta_w) \right|^2 = \left| \frac{\sin(\pi \frac{0.884}{\theta_{bw}} \sin(\theta))}{\pi \frac{0.884}{\theta_{bw}} \sin(\theta)} \right|^2
-\]
+\end{equation}
 where $\theta_{bw}$ is the beam width in radians.  Figures \ref{f:linebp_polar} and \ref{f:linebp}\footnote{Figure Python source code at \url{https://bitbucket.org/brian_bingham/ocean_notes/src/master/src/single_beam/beam_pattern.py}} illustrate this beam pattern for a range of $L/\lambda$ values.  The differences in the beam shape between $[-\theta_w,\theta_w]$ is sufficiently small to be neglected.
 
 \begin{figure}[hb!]
@@ -190,19 +190,19 @@ For a single beam sonar the model generates a single range and intensity pair: $
 \subsubsection{Beam Echo Level - Intensity}
 
 The intensity value for each ray is the echo level for that geometry, $i_k = EL_k$.  We use a weighted average to model the beam pattern effect
-\[
+\begin{equation}
 \bar{EL} = \bar{i} = \frac{ \sum_{k=0}^{N} w_k i_k }{\sum_{k=0}^N w_k}
-\]
+\end{equation}
 where the weights are determined from the beam pattern function
-\[
+\begin{equation}
 w_k = \left| G(\theta_k) \right|^2 = \left| \frac{\sin(\pi \frac{0.884}{\theta_{bw}} \sin(\theta_k))}{\pi \frac{0.884}{\theta_{bw}} \sin(\theta_k)} \right|^2
-\]
+\end{equation}
 
 \subsubsection{Beam Range}
 The single-beam range value is the ray length corresponding to the maximum intensity, i.e.,\footnote{Need to improve notation here.}
-\[
+\begin{equation}
 (\bar{r},i_{max}) = \max(R)
-\]
+\end{equation}
 
 
 \begin{figure}[hbt!]
