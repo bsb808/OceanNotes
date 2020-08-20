@@ -1,0 +1,673 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% latex_template_ieee_bbing.tex
+%
+% 28.02.2008  bsb Created 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Final - 2 column style
+%\documentclass[10pt,final,journal]{../latexlib/latex_ieee/IEEEtran}
+% Draft - single column style
+\documentclass[11pt,draftcls,journal,onecolumn]{../latexlib/latex_ieee/IEEEtran}
+
+% If the IEEEtran.cls has not been installed into the LaTeX system files, 
+% manually specify the path to it:
+% \documentclass[conference]{../sty/IEEEtran} 
+
+% Gives LaTeX2e the abilsity to do double column
+%% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor IEEEtran}
+
+% From thesis main (bbing)
+\usepackage{amssymb,longtable,dcolumn}
+
+% to use pdflatex
+% Standard bbing packages
+\usepackage{cite}      % Written by Donald Arseneau
+\usepackage{graphicx}  % Written by David Carlisle and Sebastian Rahtz
+\usepackage{url}       % Written by Donald Arseneau
+\usepackage{amssymb,longtable,dcolumn}
+\usepackage{bm}
+%\usepackage{subfigure}
+%\usepackage{stfloats}  % Written by Sigitas Tolusis
+\usepackage[caption=false,font=footnotesize]{subfig}
+%\usepackage{fixltx2e}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{units}
+\usepackage{../latexlib/latex_cmds/math_bbing}
+\usepackage{acronym}
+\usepackage{csvsimple}
+\usepackage{../latexlib/latex_cmds/my_acronyms}
+\usepackage{color,soul}
+
+\begin{document}
+
+\newtheorem{remark}{Remark}
+\renewcommand{\theremark}{\unskip}
+
+
+\input{../latexlib/latex_cmds/Commands}  % shortcuts to thesis stuff
+\input{../latexlib/latex_cmds/defs}
+%\include{./latex_cmds/Commands}  % shortcuts to thesis stuff
+%\include{./latex_cmds/defs}
+
+
+% set the figure default size
+\newcommand{\SF}{0.2}
+\newcommand{\SFb}{0.45}
+\newcommand{\SFPic}{0.45}
+\newcommand{\SFPlot}{0.45}
+\newcommand{\SFc}{0.25}
+% Just a lazy way of setting the figure width (percentage of text width)
+% 0.7 works well for 1 column
+% 0.4 works well for 2 column
+\newcommand{\FigWidth}{\SFb}
+
+% Use this one for the draft version
+\newcommand{\scaleOneTwo}[2] {\scalebox{#1}}
+% Use this one for the two column version
+%\newcommand{\scaleOneTwo}[2] {\scalebox{#2}}
+
+% Graphics for this paper
+\graphicspath{{images/}}
+
+% paper title
+%\title{Towards an Experimentally Validated Plume Model to Support Robotic Plume Characterization}
+\title{USV Modeling}
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{Brian~Bingham$^{1}$% <-this % stops a space
+\thanks{$^{1}$ Brian~Bingham is with the Department of Mechanical and Aerospace Engineering, Naval Postgraduate School, Monterey, CA 93950, USA. {\tt\small bbingham@nps.edu}}%
+}
+
+% make the title area
+\maketitle
+
+%\begin{abstract}
+%Abstract
+%\end{abstract}
+% no keywords
+
+\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+The goal of this effort is to develop a USV model that 
+\begin{itemize}
+\item Is appropriate for design and evaluation of control algorithms
+\item Balances fidelity with capacity for empirical parameter estimation
+\item Can be identified using static tests and maneuvering trials with a USV and on board sensors
+\item Makes use of physically measurable quantities (mass and inertia)
+\item Enables prediction of dynamics with and without water current
+\end{itemize} 
+
+\section{Background}
+
+Below is a survey of a small number of the relevant prior work on modeling USVs for control.  
+
+\subsection{\cite{fossen94guidance} and \cite{fossen11handbook}}
+The maneuvering models described by Fossen appear to be the basis for most of the USV work.  The references contain a number of different generic models and extensions of these models for specific cases.  The focus tends to be on full-sized surface ships and platforms, but are relevant to small USVs. 
+
+\subsection{\cite{sonnenburg10control} and \cite{sonnenburg13modeling}}
+
+\cite{sonnenburg13modeling} and \cite{sonnenburg10control} examine model for USV with steerable outboard motor (vectored thrust) where sideslip is a major concern.  Uses notation and maneuvering model from \cite{fossen94guidance}.
+\begin{itemize}
+\item Full vessel model is includes linear and quadratic damping
+\item All models are then linearized (perturbation dynamics) for the purpose of identification where the coefficients are parameterized by the states (surge, sway and yaw-rate)
+\item Actuation model thrust as a linear  and quadratic with velocity dependence.
+\end{itemize}
+Model identification appears to throw out the physical model and rely on identification of linear models (perturbation models) and a set of discrete speeds.
+\begin{itemize}
+\item Model identification includes open-loop maneuvers to identify steady-state parameters and closed-loop maneuvers to identify dynamic parameters.
+\begin{enumerate}
+\item Steady-state values are identified by as linear relationships between yaw-rate, side-slip angle and side-sleep speed.  The coefficients of these a relationships are determined for a set of discrete, constant speeds.  The values of these coefficients change significantly over the range of forward speeds and now functional relationship is offered.  
+\item Thruster model conflates both the thrust relationship and the inertia of the system.  Model is identified by measuring initial acceleration during step changes in engine RPM and identifying the two linear coefficients of a linear model.  This single model is constant over the range of speeds.  Sparse data at higher speeds.
+\item Speed/surge is modeled as first-order model parameterized over speed range.
+\item Steering model (first order Nomoto model with sideslip) is identified by minimizing a quadratic cost function of sideslip angle and yaw-rate over close-loop time histories. Again, the linearized models have coefficients that change with speed.  The results again show significant changes over the speed envelope without offering a functional relationship.
+\end{enumerate}
+\end{itemize}
+
+\subsection{\cite{caccia08practical}}
+Uses the nonlinear model of Blanke \cite{blanke81ship} as reported in \cite{fossen94guidance}.  Speed/surge model:
+\begin{itemize}
+\item Neglects added mass term based on Blanke comments.  Blanke suggests that the surge added mass term ``will typically be less then 5\%'' \cite{fossen94guidance}.
+\item Neglects $r^2$ terms, as suggested by Blanke, based on assuming reasonable low yaw-rate (< 10 degrees/s). 
+\item Assumes linear+quadratic drag.  The Blanke model reported in \cite{fossen94guidance} includes only the quadratic term.  
+\item Neglects the Coriolis terms based on assuming negligible sway velocity.  The experimental evidence from \cite{sonnenburg13modeling} and \cite{sonnenburg10control} indicate that there is a significant sideslip angle, hence a significant sway velocity.
+\end{itemize}
+Steering model
+\begin{itemize}
+\item Neglects added mass in surge and yaw.
+\end{itemize}
+Sway (sideslip) was not observable in experiments!  Used only GPS and heading for identification making making many of the estimated quantities unreliable or unobservable.
+
+Thrust model neglects speed of advance, assumes thrust is independent of vessel speed.
+
+\section{Simplified Models for Control}
+The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively. 
+
+Euler angles for angular deplacements/velocities are
+\begin{itemize}
+\item roll $\phi$, $p=\dot{\phi}$
+\item pitch $\theta$, $q=\dot{\theta}$
+\item yaw $\psi$, $r=\dot{\psi}$
+\end{itemize}
+
+We consider control to regulate the forward speed ($u$) and the yaw angle ($\psi$) simultaneously, but for simplicity we will consider surge and yaw indpendenty.  This allows us to develop single-input, single-output control designs for each degree-of-freedem independently, and them combine them in the implementation.
+
+\subsection{Linear Models of Surge and Yaw}
+This is the simplest model and us useful as a benchmark for control performance.
+\begin{itemize}
+\item linear dynamics
+\item linear thrust model
+\item unbounded thrust
+\item uncoupled dynamics (surge/sway/yaw)
+\end{itemize}
+
+Control inputs:
+\begin{itemize}
+\item $X_c$ is total control force in the surge direction.
+\item $N_c$ is the total control torque in the yaw direction.
+\end{itemize}
+
+Surge model
+\[
+m \dot{u} + X_u u = X_c
+\]
+where $m$ is the total mass, both rigid body and added mass, and $X_u$ is the linear drag.
+
+Yaw model
+\[
+I_z \ddot{\psi} + N_r \dot{\psi} = N_c
+\]
+where $I_z$ is the total inertia in the yaw direction and $N_r$ is the linear drag.
+
+Here are some rough physical parameters to use.
+\begin{itemize}
+\item $m=\unit[28]{kg}$: based on weight specified by clearpth.  Ignores added-mass.  Should weigh our actual USV to verify.
+\item $X_u=\frac{\unitfrac[1.5]{m}{s}}{\unit[40]{N}}=\unitfrac[0.0375]{m}{Ns}$: based on linear interpretation of Figure~\ref{f:t-force}.
+\item $I_z = \unit[28]{kg} (\unit[0.5]{m})^2 = \unit[6.25]{kg m^2}$: based on approximation of USV as thin disc.
+\item $N_r = \frac{\unitfrac[0.25]{rad}{s}}{\unit{8}{Nm}} = \unitfrac[0.0313]{rad}{Nms}$: basded on linear interpretation of Figure~\ref{f:t-yaw}.
+\end{itemize}
+
+\subsubsection{Linear Model Control: PID}
+
+With this specific model, we can apply build a two PID controllers - one for the surge model (PI control) and one of the yaw model (PD control).  Use Zeigler-Nichols, or similar, tuning process to standardize the tuning.  Use this as a baseline for closed-loop performance.
+
+\subsubsection{Linear Model Control: PID+}
+Consider adding a feedforward term to the surge PI controller to anticipate drag.  (This isn't really applicable to the yaw controller.)  See \cite{caccia00guidance} for an example of such an architecture, which includes both feedforward and gain scheduling.  We'll only deal with feedforward for now.
+\begin{itemize}
+\item How much does adding feedforward change the performance?
+\end{itemize}
+
+
+
+\subsection{Uncoupled Non-Linear Models}
+
+\subsubsection{Quadratic Drag}
+If we consider the drag force in surge and yaw as proportial to the square of the velocity, we arrive the models
+\begin{eqnarray}
+m \dot{u} +  \left(X_{u|u|}\right) |u| u = X_c \\
+I_z \ddot{\psi} + \left(N_{r|r|}|\right)|\dot{\psi}|\dot{\psi} = N_c.
+\end{eqnarray}
+The quadratic drag coefficients were identified by Nick Manzini based on the data in Figures~\ref{f:drag_surge} and~\ref{f:drag_yaw}.  The estimates of the terms are
+\begin{eqnarray}
+X_{u|u|} = \unitfrac[16.9]{N}{(m/s)^2} \\
+N_{r|r|} = \unitfrac[139.0]{(Nm)}{(rad/s)^2} .
+\end{eqnarray}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\linewidth]{quad_drag_surge.png}
+\caption{Experimental identification of surge drag characteristics.}
+\label{f:drag_surge}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\linewidth]{quad_drag_yaw.png}
+\caption{Experimental identification of yaw drag characteristics.}
+\label{f:drag_yaw}
+\end{figure}
+
+\subsubsection{Linear Thrust Saturation}
+Another important aspect of the system that can be represented is the limitation of the available control thrust. The bollard test data in Figure~\ref{f:tcurve} suggest the maximum forward thrust for each thruster is \unit[20]{N} and the maximum reverse thrust is \unit[-12]{N}.  
+
+For surge force ($X_c$), this would result it maximum forward thrust of \unit[40]{N} and a minimum forward thrust of \unit[-12]{N}.
+
+For yaw torque ($N_c$), this would result in a maximum of \unit[14]{Nm} - based on a distance between the two thrusters of \unit[0.88]{m}.
+
+ 
+\subsubsection{Nonlinear Thrust Curve}
+The input to the USV is a motor command.  This command is a normalized value ($\{-1.0,1.0\}$) sent to the speed controller for the electric motor.  This results in a thrust force for each thruster.  The experimental results in Figure~\ref{f:tcurve} and Table~\ref{t:tcurve} illstrate this nonlinear relationship.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{thrust_cmd_relationship.png}
+\caption{Relationship between thrust command a total measured thrust force (two thrusters). The ``line of best fit'' is a spline fit of the data.}
+\label{f:tcurve}
+\end{figure}
+
+\begin{table}[hbt!] 
+\renewcommand{\arraystretch}{1.2}
+\caption{Relationship between measured thrust and thrust command for a single thruster.  }
+\label{t:tcurve}
+\centering
+\csvautotabular{tcurve.csv}
+\end{table}
+
+We could implement this in at least two different ways.  We could use a table lookup method to interpolate between the discrete data points in Table~\ref{t:tcurve}.  For the purposes of the simulated USV model, this method would likely provide better agreement with the vehilce behavior.
+
+Alternatively, we could fit the data with a function.  The generalized logitic function,
+\begin{equation}
+Y(x) = A + \frac{K-A}{ \left(C + \exp{(-B(x-M))} \right)^{1/\nu} },
+\end{equation}
+is a good candidate.  Because the thrust curve is not symmetric, we need to fit two curves---one for forward thrust and one for reverse thrust.  The resulting thruster curve model in Figure~\ref{f:tcurve_both} uses the parameters in Table~\ref{t:tcurvefit}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{tcurve_pos.png}
+\caption{Thrust curve model for forward thrust - single thruster.}
+\label{f:tcurve_pos}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{tcurve_neg.png}
+\caption{Thrust curve model for reverse thrust - single thruster.}
+\label{f:tcurve_neg}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{tcurve_both.png}
+\caption{Thrust curve model, generalized logistic functions, for forward and reverse thrust - single thruster.}
+\label{f:tcurve_both}
+\end{figure}
+
+
+\begin{table}[hbt!] 
+\renewcommand{\arraystretch}{1.2}
+\caption{Generalized logistic function parameters for curve fit.}
+\label{t:tcurvefit}
+\centering
+\csvautotabular{tcurvefit.csv}
+\end{table}
+
+\clearpage
+
+
+
+\section{Maneuvering Models}
+\subsection{Nonlinear Maneuvering Model based on Second-order Modulus Functions}
+This model contains second-order (linear and quadratic) terms for the dissapative terms. In this section we follow the notation and process detailed in \cite{fossen11handbook}, Chapter 7. The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively.  The velocities are considered to be relative to an irrotational constant ocean current.  The nonlinear maneuvering equations from \cite{fossen11handbook} are
+\beqn
+\underbrace{\bm{M}_{RB}\dot{\bm{\nu}}+\bm{C}_{RB}(\bm{\nu})\bm{\nu}}_\text{rigid-body forces} +
+\underbrace{\bm{M}_A\dot{\bm{\nu}}_r + \bm{C}_A(\bm{\nu}_r)\bm{\nu}_r + 
+\bm{D}(\bm{\nu}_r)\bm{\nu}_r}_\text{hydrodynamic forces}
+= \bm{\tau}+\bm{\tau}_{wind}+\bm{\tau}_{waves}
+\label{e:fossenmodel}
+\eeqn
+where $\bm{\nu}_r$ is the velocity vector relative to an irrotational water current $\bm{\nu}_c$, i.e., $\bm{\nu}=\bm{\nu}_r+\bm{\nu}_c$.  The rigid body kinetics are represented by the rigid body mass $\bm{M}_{RB}$ 
+\beqn
+\bm{M}_{RB}= \left[ 
+\begin{array}{ccc}
+m & 0 & 0 \\
+0 & m & m x_g \\
+0 & m x_g & I_z 
+\end{array} \right],
+\eeqn
+where $m$ is the mass of the vehicle, $I_z$ is the moment of inertia about the body-centered z-axis and $x_g$ is distance along the x-axis from the origin of the body-centered frame to the center of gravity of the vessel.  The second rigid body term is the Coriolis-centripetal matrix,
+\beqn
+\bm{C}_{RB}(\bm{\nu})= \left[ 
+\begin{array}{ccc}
+0 & 0 & -m(x_gr+v) \\
+0 & 0 & mu \\
+m(x_gr+v) & -mu  & 0 
+\end{array} \right].
+\eeqn
+Note that $\bm{C}_{RB}(\bm{\nu})$ is skew-symmetric, i.e., $\bm{C}_{RB}(\bm{\nu})=-\bm{C}_{RB}^T(\bm{\nu})$.  The hydrodynamic effects are represented by the added mass matrix
+\beqn
+\bm{M}_{A}= \left[ 
+\begin{array}{ccc}
+-X_{\dot{u}} & 0 & 0 \\
+0 & -Y_{\dot{v}} & -Y_{\dot{r}} \\
+0 & -Y_{\dot{r}} & -N_{\dot{r}} 
+\end{array} \right].
+\eeqn
+and the Coriolis-centripetal matrix for the added mass
+\beqn
+\bm{C}_{A}(\bm{\nu}_r)= \left[ 
+\begin{array}{ccc}
+0 & 0 & Y_{\dot{v}}v_r+Y_{\dot{r}}r \\
+0 & 0 & -X_{\dot{u}}u_r\\
+ -Y_{\dot{v}}v_r - Y_{\dot{r}}r& X_{\dot{u}}u_r & 0 
+\end{array} \right].
+\eeqn
+It is worth noting that $\bm{C}_A$ includes the nonlinear Munk moment (see \cite{fossen11handbook} p.121).  Following \cite{fossen11handbook} the SNAME notation for the hydrodynamic derivatives.
+
+The linear and quadratic drag terms
+\beqn
+\bm{D}(\bm{\nu}_r)= \left[ 
+\begin{array}{ccc}
+X_u + X_{u|u|}|u| & 0 & 0 \\
+0 & Y_v + Y_{v|v|}|v| & Y_r+Y_{r|r|}|r|\\
+0 & N_v + N_{v|v|}|v| & N_r+N_{r|r|}|r|
+\end{array} \right].
+\eeqn
+
+Equivalently we can express the same model in non-matrix form, where the speed equation in the surge direction is 
+\beqn
+\underbrace{m \dot{u}}_\text{RB inertia}  
+- \underbrace{m x_g r^2}_\text{RB centripetal}
+- \underbrace{mvr}_\text{RB Coriolis}
+=
+\underbrace{X_{\dot{u}} \dot{u}_r}_\text{AM inertia}
++ \underbrace{Y_{\dot{v}}v_r r}_\text{AM Coriolis}
++ \underbrace{Y_{\dot{r}}r^2}_\text{AM centripetal}
++ \underbrace{X_u u + X_{u|u|}|u|u}_\text{Drag} 
++ \underbrace{\tau}_\text{Thrust}
+\label{e:fullu}
+\eeqn
+and the coupled steering questions in the sway direction 
+\beqn
+\underbrace{m \dot{v} + m x_g \dot{r}}_\text{RB inertia}  
++ \underbrace{m ur}_\text{RB Coriolis}
+- \underbrace{Y_{\dot{v}}\dot{v} - Y_{\dot{r}}\dot{r}}_\text{AM inertia}
+=
++ \underbrace{Y_v v + Y_{v|v|}|v|v}_\text{Drag} 
++ \underbrace{Y_r r + Y_{r|r|}|r|r}_\text{Coupled Drag} 
+\label{e:fullv}
+\eeqn
+and yaw directions 
+
+\beqn
+\underbrace{I_z \dot{r} + m x_g \dot{v}}_\text{RB inertia}  
++ \underbrace{m x_g ru}_\text{RB Coriolis}
+- \underbrace{Y_{\dot{r}}\dot{v} - N_{\dot{r}}\dot{r}}_\text{AM inertia}
+- \lefteqn{\overbrace{\phantom{Y_{\dot{v}}v_r u + X_{\dot{u}}u_r v}}^\text{Monk Moment}}
+\underbrace{Y_{\dot{v}}v_r u + X_{\dot{u}}u_r v - Y_{\dot{r}}ru}_\text{AM Coriolis}
+- \underbrace{N_v v + N_{v|v|}|v|v}_\text{Coupled Drag} 
++ \underbrace{N_r r + N_{r|r|}|r|r}_\text{Drag} 
+= 
++ \underbrace{\tau}_\text{Torque}
+\label{e:fullr}
+\eeqn
+
+\subsection{Nonlinear Model of Blanke}
+As reported by \cite{fossen94guidance}, this model ``retains the most important terms for steering and propulsion''.  Formulating these equations for a rudder-less vessel, the speed equation becomes
+\beqn
+(m-X_{\dot{u}}) \dot{u} = X_{u|u|}|u|u + (m+X_{vr})vr + (mx_g+X_{rr})r^2 + \tau
+\label{e:blankeu}
+\eeqn
+Comparing (\ref{e:fullu}) and (\ref{e:blankeu}), noting that $Y_{\dot{v}}$ from  (\ref{e:fullu}) is equivalent to $X_{vr}$ in (\ref{e:blankeu}),  we can see that the only difference between these models is that the full model in (\ref{e:fullu}) includes both linear and quadratic drag terms, while Blanke's model includes only a quadratic term.  The linear term is important because it forces the system to converge to zero surge.  Furthermore, results of other experiments suggest that the drag is not purely quadratic.  
+
+Blanke's steering model in sway, without rudder terms, is
+\beqn
+(m-Y_{\dot{v}}) \dot{v} + (m x_g - Y_{\dot{r}}) \dot{r}
+=
+-(m -Y_{ur})ur + Y_{uv}uv + Y_{v|v|}|v|v + Y_{|v|r}|v|r.
+\label{e:blankev}
+\eeqn
+Comparing (\ref{e:fullv}) and (\ref{e:blankev}) we note the following differences
+\begin{itemize}
+\item The ``Coupled Drag'' term in (\ref{e:fullv}) is neglected in the Blanke model. \hl{What is the affect of neglecting these coupled drag terms? Appears fairly commonly in simplified models.}
+\item The linear component of cross-flow drag (\ref{e:fullv}) is neglected in the Blanke model
+\item The following second-order cross-coupling terms are present in Blanke that are not represented in  (\ref{e:fullv})
+  \begin{itemize}
+    \item $Y_{ur}ur$ - which appears as an added mass Coriolis term
+    \item $Y_{uv}uv$
+    \item $Y_{|v|r}|v|r$
+    \item \hl{What is the consequence of neglecting these? 
+Ditto for the yaw eqn.}
+  \end{itemize}
+\end{itemize}
+The steering equation for yaw is
+\beqn
+(m x_g - N_{\dot{v}})\dot{v} + (I_z - N_{\dot{r}})\dot{r}
+=
+-(m x_g - N_{ur})ur + N_{uv}uv + N_{v|v|}|v|v + N_{|v|r}|v|r
+\label{e:blanker}
+\eeqn
+\hl{What/Why is the quadratic yaw drag expressed as $N_{v|v|}|v|v$?  Seems like it would be $N_{r|r|}|r|r$.}
+
+\noindent
+Comparing (\ref{e:fullr}) and (\ref{e:blanker}), we note that the Monk moment has been collapsed into a single term $N_{uv}uv$ in (\ref{e:blanker}).  We note the following differences
+\begin{itemize}
+\item The ``Coupled Drag'' term in (\ref{e:fullr}) is neglected in the Blanke model
+\item The linear component of yaw drag (\ref{e:fullv}) is neglected in the Blanke model
+\item The second-order cross-coupling term $N_{|v|r}|v|r$ is present in Blanke model and not represented in\eref{e:fullr}.
+\end{itemize}
+
+\subsection{Simplified Model of Blanke from \cite{caccia08practical}}
+In \cite{caccia08practical} the Blanke model is used, with the addition of linear drag terms, and the following assumptions are made:
+\begin{itemize}
+\item Speed: Surge
+  \begin{itemize}
+  \item Added mass in surge ($X_{\dot{u}}$) is negligible - less than 5\% of vessel mass.  This seem reasonable, but is not really necessary since the mass and added mass are lumped together in the identification.
+  \item The Coriolis terms $(m+X_{vr})vr$, both rigid body and added mass contributions, are negligible because the sway speed is negligible.  \hl{This would seem to limit the sideslip.}  The experiments in \cite{sonnenburg10control}suggest the sideslip would be an important component for this type of vehicle.
+  \item The centripetal terms $(mx_g+X_{rr})r^2$ are neglected on the assumption of a low turn rate.  This is probably reasonable?
+  \end{itemize}
+\item Steering: Sway and Yaw
+  \begin{itemize}
+  \item Added mass in both directions is neglected.  Again, probably not necessary since the identification estimates the combination of rigid body and added mass.
+  \item Although the author's don't make it explicit(!), they neglect the rigid body and added mass coupling terms  \hl{I believe this is equivalent to assuming that the principle axes of inertia for the vessel (the body-centered coordinate frame) are co-located with the center of mass of the vessel.}
+    \begin{itemize}
+    \item $(m x_g - Y_{\dot{r}})\dot{r}$ in the sway equation
+    \item $(m x_g - N_{\dot{v}})\dot{v}$ in the yaw equation
+    \end{itemize}
+  \item Again, this is not explicit, but the authors omit the Coriolis terms, both rigid body and added mass, $-(mx_g-N_{ur})ur$. The reason for omission is not provided in the text.
+  \item The ``coupled drag terms are neglected because $v$ and $r$ are typically small''.  We can only assume they are referring to the following terms - \hl{Are these correctly identified as ``coupling drag terms''?  Are they negligible?}
+    \begin{itemize}
+    \item $Y_{uv}uv$ and $Y_{|v|r}|v|r$ are negligible in sway
+    \item $N_{uv}uv$ and $N_{|v|r}|v|r$ are negligible in yaw
+    \end{itemize}
+   \item The quadratic term $N_{|v|v}|v|v$ in the Blanke model is substituted with a linear and quadratic term as a function of yaw, $N_r r+N_{|r|r}|r|r$. \hl{As indicated previously, I'm not clear whey this term is related to the sway velocity in the first place.}
+  \end{itemize}
+\end{itemize}
+For our vessel this would be equivalent to the following speed and steering equations
+\beqn
+m\dot{u} = X_u u X_{|u|u}|u|u + \tau
+\eeqn
+\beqn
+(m) \dot{v}
+=
+-(m -Y_{ur})ur + Y_v v + Y_{v|v|}|v|v .
+\label{e:blanke2v}
+\eeqn
+\beqn
+I_z\dot{r}
+=
+ N_r r + N_{r|r|}|r|r + \tau
+\label{e:blanke2r}
+\eeqn
+This model is greatly simplified. \hl{Us such a high degree of simplification justified?}
+
+\subsection{\cite{muske08identification}}
+The model in \cite{muske08identification} supposedly comes from  \cite{fossen94guidance} (although I haven't found it yet).  This model includes a power-law drag model in each direction, combined rigid body and added mass terms and (unlike the simplified Blanke model from \cite{caccia08practical}) includes the Coriolis terms.  The equations of motion are
+\begin{eqnarray}
+m_{11}\dot{u} - m_{22}vr + d_1 u^{\alpha_1} = \tau_{Thrust} \\
+m_{22}\dot{v} +  m_{11}ur + d_2 u^{\alpha_2} = 0\\
+m_{33}\dot{r} + (m_{22}-m_{11})uv + d_3 u^{\alpha_3} = \tau_{Torque} \\
+\end{eqnarray}
+Comparing this model to the nonlinear maneuvering model in \eref{e:fullu} \eref{e:fullv} \eref{e:fullr} we see that
+\begin{itemize}
+\item Rigid body mass and added mass are combined in all terms
+\item They assume the body-axis and center of mass are collocated
+\item All centripetal terms are neglected
+\item Drag modeled as a power law, which may be more general (with the same number of parameters) as the linear+quadratic model.
+\item There are some additional assumptions here to make this work out - i.e., deriving this from the original nonlinear model.
+\end{itemize}
+
+\subsection{Thrust Model}
+Two options:
+
+Assume thrust is independent of speed (as done in the Caccia papers).
+
+Or assume and unknown, linear decrease in thrust with speed.
+\[
+T = T_o (1-au)
+\]
+where $a$ is the linear speed reduction
+\subsection{Speed model}
+Consider the surge state of the model above where
+\beqn
+\underbrace{m \dot{u}}_\text{RB inertia}  
+- \underbrace{m x_g r^2}_\text{RB centripetal}
+- \underbrace{mvu}_\text{RB Coriolis}
+=
+\underbrace{X_{\dot{u}} \dot{u}}_\text{AM inertia}
++ \underbrace{Y_{\dot{v}}v_r r}_\text{AM Coriolis}
++ \underbrace{Y_{\dot{r}}r^2}_\text{AM centripetal}
++ \underbrace{X_u u + X_{u|u|}|u|u}_\text{Drag} 
++ \underbrace{T}_\text{Thrust}
+\eeqn
+Following \cite{caccia08practical}, based on \cite{fossen94guidance}, we neglect the second-order centripetal terms
+\beqn
+m \dot{u}
+- mvu
+=
+X_{\dot{u}} \dot{u}
++ Y_{\dot{v}}v_r r
++ X_u u + X_{u|u|}|u|u
++ T
+\eeqn
+
+For steady state forward motion ($\dot{u}=v=r=0$) in stationary water ($v_r=0$)
+\beqn
+0 =
++ X_u u + X_{u|u|}|u|u
++ T
+\eeqn
+We can estimate $X_u$ and $X_{u|u}$ from steady state forward motion trials with known thrust input by testing at a series of known forward speeds and measuring $u$.
+
+Considering forward-only acceleration
+\beqn
+m \dot{u}
+=
+X_{\dot{u}} \dot{u}
++ X_u u + X_{u|u|}|u|u
++ T
+\eeqn
+we can identify the added mass ($X_{\dot{u}}$) by either estimating the initial acceleration (see \cite{sonnenburg10control}) or by examining the 'time constant' for such tests.
+
+This leaves the coefficient $Y_{\dot{v}}$, related to the added-mass Coriolis force, as the single unknown.
+
+
+\section{Proposed Model}
+
+\subsection{Actuation Model}
+The thrust provided by each motor is a function of the command input ($\alpha$) provided to the motor controller.  The total thrust applied to the vessel is twice the motor thrust, so
+\begin{equation}
+\tau_{thrust}= 2 (f(\alpha)).
+\label{e:thrust}
+\end{equation}
+
+Torque is applied to the vessel by a torque command ($\beta$) applied equal and opposite to the two thrusters separated by a distance of $d$, so
+\begin{equation}
+\tau_{torque}= d (f(\beta)).
+\label{e:torque}
+\end{equation}
+
+We assume that any lag between the command inputs and the resutling thurst and torque is small compared to the dynamics of the vessel.
+
+\subsection{Maneuvering Model}
+We start with the maneuvering model from \cite{fossen11handbook} Chapter 7, in (\ref{e:fossenmodel}---\ref{e:fullr}).  We make the following assumptions
+\begin{itemize}
+\item The center of mass of the vehicle and the origin of the principle axes are co-located.  Therefore $x_g$ can be neglected.
+\item Centripetal terms can be neglected because of typically small yaw rates.
+\item The coupled terms in the added mass matrix ($Y_{\dot{r}}$) are sufficiently small to be neglected.
+\item The coupling in the drag matrix can be neglected.
+\item The values for the mass ($m$) and inertia ($I_z$) of the vessel can be measured directly
+\item For the purposes of model identification, the water current velocity is zero so that $\bm{nu}=\bm{nu}_r$.
+\end{itemize}
+Applying these assumptions, we can formulate the maneuvering model as follows.  The mass matrix becomes the diagonal matrix
+\beqn
+\bm{M}= \left[ 
+\begin{array}{ccc}
+m-X_{\dot{u}} & 0 & 0 \\
+0 & m-Y_{\dot{v}} & 0 \\
+0 & 0 & I_z-N_{\dot{r}} 
+\end{array} \right].
+\eeqn
+The Coriolis matrix reduces to 
+\beqn
+\bm{C}(\bm{\nu})= \left[ 
+\begin{array}{ccc}
+0 & 0 & -(m-Y_{\dot{v}})v \\
+0 & 0 & (m-X_{\dot{u}})u \\
+(m-Y_{\dot{v}})v & -(m-X_{\dot{u}})u  & 0 
+\end{array} \right].
+\eeqn
+The linear and quadratic drag matrix becomes
+\beqn
+\bm{D}(\bm{\nu}_r)= \left[ 
+\begin{array}{ccc}
+X_u + X_{u|u|}|u| & 0 & 0 \\
+0 & Y_v + Y_{v|v|}|v| & 0 \\
+0 & 0  & N_r+N_{r|r|}|r|
+\end{array} \right].
+\eeqn
+
+
+\section{Model Identification Tests}
+\subsection{Physical Measurements}
+\begin{itemize}
+\item Measure the mass ($m$) directly.  
+\item Measure the moment of inertia ($I_z$) using a bifilar pendulum.
+\end{itemize}
+
+\subsection{Thrust Characterization}
+Bollard tests in the tank to measure thrust force (at zero velocity) as a function of motor command.  Use a load cell to measure the steady state force generated by the thrusters when attached to the tank.  Measure the force at a number of thrust commands (e.g., 10 steps between 0-1.0 and -1.0-0).  Fit a curve to the resulting command vs. thrust relationship to identify the function in (\ref{e:thrust}).
+
+\subsection{Steady-State Tests}
+\begin{itemize}
+\item Yaw: Measure the steady-state yaw rate at variety of torque inputs to identify the yaw drag terms. Direct estimate of $N_r$ and $N_{r|r|}$.
+\item Surge: Measure the steady-state speed at a variety of thrust inputs to identify the drag terms. Direct estimate of $X_u$ and $X_{u|u|}$.
+\end{itemize}
+
+
+\subsection{Open-Loop Dynamic Tests}
+\begin{itemize}
+\item Yaw: Measure step response to torque to estimate added mass/inertia in yaw.  Direct estimate of $N_{\dot{r}}$.
+\item Surge: Measure step response to forward thrust (with heading control?) to estimate added surge mass. Direct estimate of $X_{\dot{u}}$.
+\end{itemize}
+
+\subsection{Maneuvering Tests}
+We are left with the following parameters to identify
+\begin{itemize}
+\item $Y_{\dot{v}}$: Added-mass in sway
+\item $Y_v$ and $Y_{v|v|}$: Linear and quadratic drag in sway
+\end{itemize}
+
+We can isolate the drag parameters by performing ``turning circle'' tests there the vehicle is moved in a circle with constant speed and yaw rate.  Performing this test at different levels of thrust and torque should all for direct estimation of the linear and quadratic drag terms.
+
+The last test is a set of step changes in speed and/or heading while executing the steady-state turning circle.  This should allow an estimate of $Y_{\dot{v}}$.
+
+%\subsection{Verification}
+%\subsection{Closed-Loop Dynamic Tests}
+
+%\section{Ship Dynamics}
+%Following \cite{fossen94guidance}, Ch 5.
+
+
+%\section{Acknowledgments}
+
+% standard IEEE bibliography style from:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/supported/IEEEtran/bibtex
+%\bibliographystyle{../latex_ieee/IEEEtran}
+\bibliographystyle{apalike}
+% argument is your BibTeX string definitions and bibliography database(s)
+\bibliography{../bibtexdatabase/bbing_master}
+%\bibliography{./latex_ieee/IEEEabrv}
+
+% if you will not have a photo at all:
+
+% that's all folks
+
+\end{document}
+
+
