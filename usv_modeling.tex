@@ -7,7 +7,7 @@
 % Final - 2 column style
 %\documentclass[10pt,final,journal]{../latexlib/latex_ieee/IEEEtran}
 % Draft - single column style
-\documentclass[11pt,draftcls,journal,onecolumn]{../latexlib/latex_ieee/IEEEtran}
+\documentclass[11pt,draftcls,journal,onecolumn]{IEEEtran}
 
 % If the IEEEtran.cls has not been installed into the LaTeX system files, 
 % manually specify the path to it:
@@ -35,11 +35,13 @@
 \usepackage{multirow}
 \usepackage{amsmath}
 \usepackage{units}
-\usepackage{../latexlib/latex_cmds/math_bbing}
 \usepackage{acronym}
 \usepackage{csvsimple}
-\usepackage{../latexlib/latex_cmds/my_acronyms}
 \usepackage{color,soul}
+
+% Custom - need to be in the path
+\usepackage{my_acronyms}
+\usepackage{math_bbing}
 
 \begin{document}
 
@@ -47,8 +49,8 @@
 \renewcommand{\theremark}{\unskip}
 
 
-\input{../latexlib/latex_cmds/Commands}  % shortcuts to thesis stuff
-\input{../latexlib/latex_cmds/defs}
+\input{Commands}  % shortcuts to thesis stuff
+\input{defs}
 %\include{./latex_cmds/Commands}  % shortcuts to thesis stuff
 %\include{./latex_cmds/defs}
 
@@ -304,63 +306,63 @@ is a good candidate.  Because the thrust curve is not symmetric, we need to fit 
 \section{Maneuvering Models}
 \subsection{Nonlinear Maneuvering Model based on Second-order Modulus Functions}
 This model contains second-order (linear and quadratic) terms for the dissapative terms. In this section we follow the notation and process detailed in \cite{fossen11handbook}, Chapter 7. The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively.  The velocities are considered to be relative to an irrotational constant ocean current.  The nonlinear maneuvering equations from \cite{fossen11handbook} are
-\beqn
+\begin{equation}
 \underbrace{\bm{M}_{RB}\dot{\bm{\nu}}+\bm{C}_{RB}(\bm{\nu})\bm{\nu}}_\text{rigid-body forces} +
 \underbrace{\bm{M}_A\dot{\bm{\nu}}_r + \bm{C}_A(\bm{\nu}_r)\bm{\nu}_r + 
 \bm{D}(\bm{\nu}_r)\bm{\nu}_r}_\text{hydrodynamic forces}
 = \bm{\tau}+\bm{\tau}_{wind}+\bm{\tau}_{waves}
 \label{e:fossenmodel}
-\eeqn
+\end{equation}
 where $\bm{\nu}_r$ is the velocity vector relative to an irrotational water current $\bm{\nu}_c$, i.e., $\bm{\nu}=\bm{\nu}_r+\bm{\nu}_c$.  The rigid body kinetics are represented by the rigid body mass $\bm{M}_{RB}$ 
-\beqn
+\begin{equation}
 \bm{M}_{RB}= \left[ 
 \begin{array}{ccc}
 m & 0 & 0 \\
 0 & m & m x_g \\
 0 & m x_g & I_z 
 \end{array} \right],
-\eeqn
+\end{equation}
 where $m$ is the mass of the vehicle, $I_z$ is the moment of inertia about the body-centered z-axis and $x_g$ is distance along the x-axis from the origin of the body-centered frame to the center of gravity of the vessel.  The second rigid body term is the Coriolis-centripetal matrix,
-\beqn
+\begin{equation}
 \bm{C}_{RB}(\bm{\nu})= \left[ 
 \begin{array}{ccc}
 0 & 0 & -m(x_gr+v) \\
 0 & 0 & mu \\
 m(x_gr+v) & -mu  & 0 
 \end{array} \right].
-\eeqn
+\end{equation}
 Note that $\bm{C}_{RB}(\bm{\nu})$ is skew-symmetric, i.e., $\bm{C}_{RB}(\bm{\nu})=-\bm{C}_{RB}^T(\bm{\nu})$.  The hydrodynamic effects are represented by the added mass matrix
-\beqn
+\begin{equation}
 \bm{M}_{A}= \left[ 
 \begin{array}{ccc}
 -X_{\dot{u}} & 0 & 0 \\
 0 & -Y_{\dot{v}} & -Y_{\dot{r}} \\
 0 & -Y_{\dot{r}} & -N_{\dot{r}} 
 \end{array} \right].
-\eeqn
+\end{equation}
 and the Coriolis-centripetal matrix for the added mass
-\beqn
+\begin{equation}
 \bm{C}_{A}(\bm{\nu}_r)= \left[ 
 \begin{array}{ccc}
 0 & 0 & Y_{\dot{v}}v_r+Y_{\dot{r}}r \\
 0 & 0 & -X_{\dot{u}}u_r\\
  -Y_{\dot{v}}v_r - Y_{\dot{r}}r& X_{\dot{u}}u_r & 0 
 \end{array} \right].
-\eeqn
+\end{equation}
 It is worth noting that $\bm{C}_A$ includes the nonlinear Munk moment (see \cite{fossen11handbook} p.121).  Following \cite{fossen11handbook} the SNAME notation for the hydrodynamic derivatives.
 
 The linear and quadratic drag terms
-\beqn
+\begin{equation}
 \bm{D}(\bm{\nu}_r)= \left[ 
 \begin{array}{ccc}
 X_u + X_{u|u|}|u| & 0 & 0 \\
 0 & Y_v + Y_{v|v|}|v| & Y_r+Y_{r|r|}|r|\\
 0 & N_v + N_{v|v|}|v| & N_r+N_{r|r|}|r|
 \end{array} \right].
-\eeqn
+\end{equation}
 
 Equivalently we can express the same model in non-matrix form, where the speed equation in the surge direction is 
-\beqn
+\begin{equation}
 \underbrace{m \dot{u}}_\text{RB inertia}  
 - \underbrace{m x_g r^2}_\text{RB centripetal}
 - \underbrace{mvr}_\text{RB Coriolis}
@@ -371,9 +373,9 @@ Equivalently we can express the same model in non-matrix form, where the speed e
 + \underbrace{X_u u + X_{u|u|}|u|u}_\text{Drag} 
 + \underbrace{\tau}_\text{Thrust}
 \label{e:fullu}
-\eeqn
+\end{equation}
 and the coupled steering questions in the sway direction 
-\beqn
+\begin{equation}
 \underbrace{m \dot{v} + m x_g \dot{r}}_\text{RB inertia}  
 + \underbrace{m ur}_\text{RB Coriolis}
 - \underbrace{Y_{\dot{v}}\dot{v} - Y_{\dot{r}}\dot{r}}_\text{AM inertia}
@@ -381,10 +383,10 @@ and the coupled steering questions in the sway direction
 + \underbrace{Y_v v + Y_{v|v|}|v|v}_\text{Drag} 
 + \underbrace{Y_r r + Y_{r|r|}|r|r}_\text{Coupled Drag} 
 \label{e:fullv}
-\eeqn
+\end{equation}
 and yaw directions 
 
-\beqn
+\begin{equation}
 \underbrace{I_z \dot{r} + m x_g \dot{v}}_\text{RB inertia}  
 + \underbrace{m x_g ru}_\text{RB Coriolis}
 - \underbrace{Y_{\dot{r}}\dot{v} - N_{\dot{r}}\dot{r}}_\text{AM inertia}
@@ -395,23 +397,23 @@ and yaw directions
 = 
 + \underbrace{\tau}_\text{Torque}
 \label{e:fullr}
-\eeqn
+\end{equation}
 
 \subsection{Nonlinear Model of Blanke}
 As reported by \cite{fossen94guidance}, this model ``retains the most important terms for steering and propulsion''.  Formulating these equations for a rudder-less vessel, the speed equation becomes
-\beqn
+\begin{equation}
 (m-X_{\dot{u}}) \dot{u} = X_{u|u|}|u|u + (m+X_{vr})vr + (mx_g+X_{rr})r^2 + \tau
 \label{e:blankeu}
-\eeqn
+\end{equation}
 Comparing (\ref{e:fullu}) and (\ref{e:blankeu}), noting that $Y_{\dot{v}}$ from  (\ref{e:fullu}) is equivalent to $X_{vr}$ in (\ref{e:blankeu}),  we can see that the only difference between these models is that the full model in (\ref{e:fullu}) includes both linear and quadratic drag terms, while Blanke's model includes only a quadratic term.  The linear term is important because it forces the system to converge to zero surge.  Furthermore, results of other experiments suggest that the drag is not purely quadratic.  
 
 Blanke's steering model in sway, without rudder terms, is
-\beqn
+\begin{equation}
 (m-Y_{\dot{v}}) \dot{v} + (m x_g - Y_{\dot{r}}) \dot{r}
 =
 -(m -Y_{ur})ur + Y_{uv}uv + Y_{v|v|}|v|v + Y_{|v|r}|v|r.
 \label{e:blankev}
-\eeqn
+\end{equation}
 Comparing (\ref{e:fullv}) and (\ref{e:blankev}) we note the following differences
 \begin{itemize}
 \item The ``Coupled Drag'' term in (\ref{e:fullv}) is neglected in the Blanke model. \hl{What is the affect of neglecting these coupled drag terms? Appears fairly commonly in simplified models.}
@@ -426,12 +428,12 @@ Ditto for the yaw eqn.}
   \end{itemize}
 \end{itemize}
 The steering equation for yaw is
-\beqn
+\begin{equation}
 (m x_g - N_{\dot{v}})\dot{v} + (I_z - N_{\dot{r}})\dot{r}
 =
 -(m x_g - N_{ur})ur + N_{uv}uv + N_{v|v|}|v|v + N_{|v|r}|v|r
 \label{e:blanker}
-\eeqn
+\end{equation}
 \hl{What/Why is the quadratic yaw drag expressed as $N_{v|v|}|v|v$?  Seems like it would be $N_{r|r|}|r|r$.}
 
 \noindent
@@ -469,21 +471,21 @@ In \cite{caccia08practical} the Blanke model is used, with the addition of linea
   \end{itemize}
 \end{itemize}
 For our vessel this would be equivalent to the following speed and steering equations
-\beqn
+\begin{equation}
 m\dot{u} = X_u u X_{|u|u}|u|u + \tau
-\eeqn
-\beqn
+\end{equation}
+\begin{equation}
 (m) \dot{v}
 =
 -(m -Y_{ur})ur + Y_v v + Y_{v|v|}|v|v .
 \label{e:blanke2v}
-\eeqn
-\beqn
+\end{equation}
+\begin{equation}
 I_z\dot{r}
 =
  N_r r + N_{r|r|}|r|r + \tau
 \label{e:blanke2r}
-\eeqn
+\end{equation}
 This model is greatly simplified. \hl{Us such a high degree of simplification justified?}
 
 \subsection{\cite{muske08identification}}
@@ -514,7 +516,7 @@ T = T_o (1-au)
 where $a$ is the linear speed reduction
 \subsection{Speed model}
 Consider the surge state of the model above where
-\beqn
+\begin{equation}
 \underbrace{m \dot{u}}_\text{RB inertia}  
 - \underbrace{m x_g r^2}_\text{RB centripetal}
 - \underbrace{mvu}_\text{RB Coriolis}
@@ -524,9 +526,9 @@ Consider the surge state of the model above where
 + \underbrace{Y_{\dot{r}}r^2}_\text{AM centripetal}
 + \underbrace{X_u u + X_{u|u|}|u|u}_\text{Drag} 
 + \underbrace{T}_\text{Thrust}
-\eeqn
+\end{equation}
 Following \cite{caccia08practical}, based on \cite{fossen94guidance}, we neglect the second-order centripetal terms
-\beqn
+\begin{equation}
 m \dot{u}
 - mvu
 =
@@ -534,24 +536,24 @@ X_{\dot{u}} \dot{u}
 + Y_{\dot{v}}v_r r
 + X_u u + X_{u|u|}|u|u
 + T
-\eeqn
+\end{equation}
 
 For steady state forward motion ($\dot{u}=v=r=0$) in stationary water ($v_r=0$)
-\beqn
+\begin{equation}
 0 =
 + X_u u + X_{u|u|}|u|u
 + T
-\eeqn
+\end{equation}
 We can estimate $X_u$ and $X_{u|u}$ from steady state forward motion trials with known thrust input by testing at a series of known forward speeds and measuring $u$.
 
 Considering forward-only acceleration
-\beqn
+\begin{equation}
 m \dot{u}
 =
 X_{\dot{u}} \dot{u}
 + X_u u + X_{u|u|}|u|u
 + T
-\eeqn
+\end{equation}
 we can identify the added mass ($X_{\dot{u}}$) by either estimating the initial acceleration (see \cite{sonnenburg10control}) or by examining the 'time constant' for such tests.
 
 This leaves the coefficient $Y_{\dot{v}}$, related to the added-mass Coriolis force, as the single unknown.
@@ -585,32 +587,32 @@ We start with the maneuvering model from \cite{fossen11handbook} Chapter 7, in (
 \item For the purposes of model identification, the water current velocity is zero so that $\bm{nu}=\bm{nu}_r$.
 \end{itemize}
 Applying these assumptions, we can formulate the maneuvering model as follows.  The mass matrix becomes the diagonal matrix
-\beqn
+\begin{equation}
 \bm{M}= \left[ 
 \begin{array}{ccc}
 m-X_{\dot{u}} & 0 & 0 \\
 0 & m-Y_{\dot{v}} & 0 \\
 0 & 0 & I_z-N_{\dot{r}} 
 \end{array} \right].
-\eeqn
+\end{equation}
 The Coriolis matrix reduces to 
-\beqn
+\begin{equation}
 \bm{C}(\bm{\nu})= \left[ 
 \begin{array}{ccc}
 0 & 0 & -(m-Y_{\dot{v}})v \\
 0 & 0 & (m-X_{\dot{u}})u \\
 (m-Y_{\dot{v}})v & -(m-X_{\dot{u}})u  & 0 
 \end{array} \right].
-\eeqn
+\end{equation}
 The linear and quadratic drag matrix becomes
-\beqn
+\begin{equation}
 \bm{D}(\bm{\nu}_r)= \left[ 
 \begin{array}{ccc}
 X_u + X_{u|u|}|u| & 0 & 0 \\
 0 & Y_v + Y_{v|v|}|v| & 0 \\
 0 & 0  & N_r+N_{r|r|}|r|
 \end{array} \right].
-\eeqn
+\end{equation}
 
 
 \section{Model Identification Tests}
@@ -661,7 +663,7 @@ The last test is a set of step changes in speed and/or heading while executing t
 %\bibliographystyle{../latex_ieee/IEEEtran}
 \bibliographystyle{apalike}
 % argument is your BibTeX string definitions and bibliography database(s)
-\bibliography{../bibtexdatabase/bbing_master}
+\bibliography{bbing_master}
 %\bibliography{./latex_ieee/IEEEabrv}
 
 % if you will not have a photo at all:
