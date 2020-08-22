@@ -9,6 +9,13 @@
 % Draft - single column style
 \documentclass[11pt,draftcls,journal,onecolumn]{IEEEtran}
 
+
+% For using overleaf or local compilation
+% See setting of true/false directly after \begin{document}
+\newif\ifoverleaf % default is \overleaftrue
+
+
+
 % If the IEEEtran.cls has not been installed into the LaTeX system files, 
 % manually specify the path to it:
 % \documentclass[conference]{../sty/IEEEtran} 
@@ -44,6 +51,8 @@
 \usepackage{math_bbing}
 
 \begin{document}
+
+%\overleaftrue
 
 \newtheorem{remark}{Remark}
 \renewcommand{\theremark}{\unskip}
@@ -147,17 +156,17 @@ Sway (sideslip) was not observable in experiments!  Used only GPS and heading fo
 
 Thrust model neglects speed of advance, assumes thrust is independent of vessel speed.
 
-\section{Simplified Models for Control}
-The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively. 
+\section{Simplified Maneuvering Models for Control}
+The horizontal-plane \emph{maneuvering model} uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively. 
 
-Euler angles for angular deplacements/velocities are
+Euler angles for angular displacements/velocities are
 \begin{itemize}
 \item roll $\phi$, $p=\dot{\phi}$
 \item pitch $\theta$, $q=\dot{\theta}$
 \item yaw $\psi$, $r=\dot{\psi}$
 \end{itemize}
 
-We consider control to regulate the forward speed ($u$) and the yaw angle ($\psi$) simultaneously, but for simplicity we will consider surge and yaw indpendenty.  This allows us to develop single-input, single-output control designs for each degree-of-freedem independently, and them combine them in the implementation.
+We consider control to regulate the forward speed ($u$) and the yaw angle ($\psi$) simultaneously, but for simplicity we will consider surge and yaw independently.  This allows us to develop single-input, single-output control designs for each degree-of-freedom independently, and them combine them in the implementation.
 
 \subsection{Linear Models of Surge and Yaw}
 This is the simplest model and us useful as a benchmark for control performance.
@@ -188,7 +197,7 @@ where $I_z$ is the total inertia in the yaw direction and $N_r$ is the linear dr
 
 Here are some rough physical parameters to use.
 \begin{itemize}
-\item $m=\unit[28]{kg}$: based on weight specified by clearpth.  Ignores added-mass.  Should weigh our actual USV to verify.
+\item $m=\unit[28]{kg}$: based on weight specified by clearpath.  Ignores added-mass.  Should weigh our actual USV to verify.
 \item $X_u=\frac{\unitfrac[1.5]{m}{s}}{\unit[40]{N}}=\unitfrac[0.0375]{m}{Ns}$: based on linear interpretation of Figure~\ref{f:t-force}.
 \item $I_z = \unit[28]{kg} (\unit[0.5]{m})^2 = \unit[6.25]{kg m^2}$: based on approximation of USV as thin disc.
 \item $N_r = \frac{\unitfrac[0.25]{rad}{s}}{\unit{8}{Nm}} = \unitfrac[0.0313]{rad}{Nms}$: basded on linear interpretation of Figure~\ref{f:t-yaw}.
@@ -304,8 +313,8 @@ is a good candidate.  Because the thrust curve is not symmetric, we need to fit 
 
 
 \section{Maneuvering Models}
-\subsection{Nonlinear Maneuvering Model based on Second-order Modulus Functions}
-This model contains second-order (linear and quadratic) terms for the dissapative terms. In this section we follow the notation and process detailed in \cite{fossen11handbook}, Chapter 7. The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively.  The velocities are considered to be relative to an irrotational constant ocean current.  The nonlinear maneuvering equations from \cite{fossen11handbook} are
+\subsection{Nonlinear Maneuvering Model based on Second-order Modulus Functions}\label{s:nonlinearmodel}
+This model contains second-order (linear and quadratic) terms for the dissipative terms. In this section we follow the notation and process detailed in \cite{fossen11handbook}, Chapter 7. The horizontal-plane maneuvering model uses the state vector $\bm{\nu}=[u,v,r]^T$ where the velocities $u$, $v$ and $r$ are in the surge, sway and yaw directions respectively.  The velocities are considered to be relative to an irrotational constant ocean current.  The nonlinear maneuvering equations from \cite{fossen11handbook} are
 \begin{equation}
 \underbrace{\bm{M}_{RB}\dot{\bm{\nu}}+\bm{C}_{RB}(\bm{\nu})\bm{\nu}}_\text{rigid-body forces} +
 \underbrace{\bm{M}_A\dot{\bm{\nu}}_r + \bm{C}_A(\bm{\nu}_r)\bm{\nu}_r + 
@@ -398,6 +407,285 @@ and yaw directions
 + \underbrace{\tau}_\text{Torque}
 \label{e:fullr}
 \end{equation}
+
+\pagebreak
+\subsection{Sonnenburg Model}
+
+The models described in \cite{sonnenburg10control} and \cite{sonnenburg13modeling} can be categorized as 
+\begin{enumerate}
+\item {\bf White Box} formulated with both the model structure and constituent parameters with physical meaning.  This model proposed with Fossen model presented in Section~\ref{s:nonlinearmodel}.  In theory, the parameter values for this model could be estimated from first principles, from analytic methods such as strip theory or numerical/CFD methods such as validated vaval architecture codes.  Although Sonnenburg presents the model structure and parameters, no estimate of the physical parameters is provided. 
+\item {\bf Grey Box, Physical Model} where the model structure and model parameters are identical to the White Box model, but where system identification is used to estimate the physical parameters from experimental measurements.   No parameter estimates are provided.
+\item {\bf Grey Box, Semi-Physical Model} formulated with a linear, state-space model structure where the model parameters cannot be mapped to physical parameters.  In this case Sonnenburg does provide empirical estimates of the non-physical model parameters.
+\end{enumerate}
+\cite{sjoberg95nonlinear,nugroho18comparison}
+
+
+\subsubsection{Nonlinear Model}
+The nonlinear model has the same terms maneuvering presented in Section~\ref{s:nonlinearmodel} with
+\begin{enumerate}
+\item the assumption that the water current velocity can be neglected so that the velocity relative to the water is equivalent to the velocity in the fixed frame, i.e., $\bm{\nu}=\bm{\nu}_r$.
+\item the thrust ($\unit[\delta T]{\%}$) and steering angle ($\unit[\delta r]{degrees}$) are the only external forces and that they are coupled to all three degrees-of-freedom.
+\end{enumerate}
+We reproduce that physical, nonlinear model as
+\begin{IEEEeqnarray}{C}
+  \label{e:sonnenphysical}
+  \IEEEyesnumber
+  \IEEEyessubnumber*
+\left[ 
+\begin{array}{ccc}
+m-X_{\dot{u}}& 0 & 0 \\
+0 & m - Y_{\dot{v}} & (m x_g) -Y_{\dot{r}}  \\
+0 &  (m x_g) -Y_{\dot{r}} & I_z -N_{\dot{r}} 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+\dot{u}\\
+\dot{v}\\
+\dot{r}
+\end{array}
+\right]
++  \\
+\left[ 
+\begin{array}{ccc}
+0 & 0 & -m(x_gr+v) + (Y_{\dot{v}}v+Y_{\dot{r}}r) \\
+0 & 0 & mu -X_{\dot{u}}u \\
+m(x_gr+v) -(Y_{\dot{v}}v + Y_{\dot{r}}r) & -mu +  X_{\dot{u}}u  & 0 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
++ \\
+\left[ 
+\begin{array}{ccc}
+X_u + X_{u|u|}|u| & 0 & 0 \\
+0 & Y_v + Y_{v|v|}|v| & Y_r+Y_{r|r|}|r|\\
+0 & N_v + N_{v|v|}|v| & N_r+N_{r|r|}|r|
+\end{array} \right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
+ \\
+= \left[
+  \begin{array}{c}
+    X_{\mathrm{cntrl}}(\delta r, \delta T) \\
+    Y_{\mathrm{cntrl}}(\delta r, \delta T) \\
+    N_{\mathrm{cntrl}}(\delta r, \delta T)
+  \end{array}
+  \right].    
+\end{IEEEeqnarray}
+
+
+\noindent
+Equivalently,
+\begin{IEEEeqnarray*}{rCL}
+    \IEEEyesnumber
+  \underbrace{m \dot{u}}_\text{RB inertia}
+- \underbrace{X_{\dot{u}} \dot{u}}_\text{AM inertia}
+- \underbrace{m x_g r^2}_\text{RB centripetal}
+- \underbrace{mvr}_\text{RB Coriolis}
++ \underbrace{Y_{\dot{v}}v r}_\text{AM Coriolis}
++ \underbrace{Y_{\dot{r}}r^2}_\text{AM centripetal}
+- \underbrace{\left(X_u u + X_{u|u|}|u|u\right)}_\text{Nonlinear Drag} 
+& = & \; \; \;
+\\
+\underbrace{X_{\text{cntrl}}(\delta r, \delta T)}_\text{Control}
+ \; \; & &   \IEEEyessubnumber
+\\
+\underbrace{m \dot{v} + m x_g \dot{r}}_\text{RB inertia}  
+- \underbrace{Y_{\dot{v}}\dot{v} - Y_{\dot{r}}\dot{r}}_\text{AM inertia}
++ \underbrace{m ur}_\text{RB Coriolis}
+- \underbrace{X_{\dot{u}} u r}_\text{AM Coriolis}
++ \underbrace{Y_v v + Y_{v|v|}|v|v}_\text{Drag} 
++ \underbrace{Y_r r + Y_{r|r|}|r|r}_\text{Coupled Drag}
+& = & \; \; \;
+\\
+\underbrace{Y_{\text{cntrl}}(\delta r, \delta T)}_\text{Control}
+ \; \; & &   \IEEEyessubnumber
+\\
+\underbrace{I_z \dot{r} + m x_g \dot{v}}_\text{RB inertia}  
+- \underbrace{\left(Y_{\dot{r}}\dot{v} + N_{\dot{r}}\dot{r}\right)}_\text{AM inertia}
++ \underbrace{m x_g ru  }_\text{RB Coriolis}
+- \lefteqn{\overbrace{\phantom{Y_{\dot{v}}v u + X_{\dot{u}}u v}}^\text{Monk Moment}}
+\underbrace{Y_{\dot{v}}v u + X_{\dot{u}}u v - Y_{\dot{r}}ru}_\text{AM Coriolis}
+- \underbrace{N_v v + N_{v|v|}|v|v}_\text{Coupled Drag} 
++ \underbrace{N_r r + N_{r|r|}|r|r}_\text{Drag} 
+& = & \; \; \;
+\\
+\underbrace{N_{\text{cntrl}}(\delta r, \delta T)}_\text{Control}
+ \; \; & &   \IEEEyessubnumber
+\end{IEEEeqnarray*}
+
+
+\subsubsection{Linearized State-Space Model}
+
+The physical model (\ref{e:sonnenphysical}) is a standard adaptation of Fossen and represents a common form of the maneuvering model based on physically meaningful model parameters.  However, the parameters of this model are neither calculated or estimated from data.  Instead the majority of the model complexity (coupling and off-diagonal terms, etc.) are neglected in the formulation of a semi-physical model for which the parameters of the model are observable from on-water experiments.  The resulting linearized state-space model can be expressed as
+\begin{IEEEeqnarray}{C}
+\label{e:statespace}
+\left[
+\begin{array}{c}
+\dot{u}\\
+\dot{v}\\
+\dot{r}
+\end{array}
+\right]
+=
+\left[ 
+\begin{array}{ccc}
+  a & 0 & 0 \\
+  0 & a_{11} & a_{12} \\
+  0 & a_{21} & a_{22} 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
++
+\left[ 
+\begin{array}{cc}
+b & 0 \\
+0 &  b_1 \\
+0 &  b_2
+\end{array} \right]
+\left[ 
+\begin{array}{cc}
+  \delta T \\
+  \delta r
+  \end{array}
+  \right].    
+\end{IEEEeqnarray}
+This model form is then used as the basis for system identification leading to the parameter estimates reproduced in Figure~\ref{f:table16}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\linewidth]{sonnenburg_table16.png}
+\caption{Source \cite{sonnenburg10control}.}
+\label{f:table16}
+\end{figure}
+
+Conceptually, the simplification from the physical model (\ref{e:sonnenphysical}) to the semi-physical state-space model (\ref{e:statespace}) could be possible with the following assumptions: 
+\begin{itemize}
+\item Surge centripetal and Coriolis terms are neglected.
+\item Yaw Coriolis terms are neglected, with the exception of the $X_{\dot{u}}uv$ term which may contribute to $a_{21}$. (There are no yaw centripetal terms.)
+\item Rigid-body and added mass inertial parameters are lumped together and can not be independently specified or estimated.
+\item The origin of the body-centered reference frame is collocated with the center of mass so that $x_g = 0$ and off diagonal terms of the inertial matrix are negligible.
+\item Drag forces are linear - quadratic terms are negligible for small changes from the setpoint.
+\item The parameters of the model in (\ref{e:statespace}) are estimated for different throttle setting as shown in Figure~\ref{f:table16}.  The functional relationship between the parameters and $u$ is not estimated.
+\end{itemize}
+
+For the purposes of comparison we re-write (\ref{e:statespace}) with the state transition matrix on the left side and the input matrix on the right, 
+\begin{IEEEeqnarray}{C}
+\label{e:statespace2}
+\left[
+\begin{array}{c}
+\dot{u}\\
+\dot{v}\\
+\dot{r}
+\end{array}
+\right]
+-
+\left[ 
+\begin{array}{ccc}
+  a & 0 & 0 \\
+  0 & a_{11} & a_{12} \\
+  0 & a_{21} & a_{22} 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
+=
+\left[ 
+\begin{array}{cc}
+b & 0 \\
+0 &  b_1 \\
+0 &  b_2
+\end{array} \right]
+\left[ 
+\begin{array}{cc}
+  \delta T \\
+  \delta r
+  \end{array}
+  \right]    
+\end{IEEEeqnarray}
+
+
+And we re-write the physical model  (\ref{e:sonnenphysical}), applying the the implicit assumption necessary to adopt the state-space form, we express this as
+\begin{IEEEeqnarray}{C}
+  \label{e:physicalcompare}
+  \IEEEyesnumber
+  \IEEEyessubnumber*
+\left[ 
+\begin{array}{ccc}
+m-X_{\dot{u}}& 0 & 0 \\
+0 & m - Y_{\dot{v}} &  -Y_{\dot{r}}  \\
+0 &  -Y_{\dot{r}} & I_z -N_{\dot{r}} 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+\dot{u}\\
+\dot{v}\\
+\dot{r}
+\end{array}
+\right]
++  \\
+\left[ 
+\begin{array}{ccc}
+0 & 0 & 0 \\
+0 & 0 & (m -X_{\dot{u}})u \\
+0 & -(m- X_{\dot{u}})u  & 0 
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
++ \\
+\left[ 
+\begin{array}{ccc}
+X_u & 0 & 0 \\
+0 & Y_v  & Y_r\\
+0 & N_v  & N_r
+\end{array} \right]
+\left[
+\begin{array}{c}
+u\\
+v\\
+r
+\end{array}
+\right]
+ \\
+= \left[
+  \begin{array}{c}
+    X_{\mathrm{cntrl}}(\delta r, \delta T) \\
+    Y_{\mathrm{cntrl}}(\delta r, \delta T) \\
+    N_{\mathrm{cntrl}}(\delta r, \delta T)
+  \end{array}
+  \right]    
+\end{IEEEeqnarray}
+
+We observe that the state-space model (\ref{e:statespace2}) used as the model form for system identification has only 5 parameters on the left hand side, while the physical model (\ref{e:physicalcompare}) has 11 parameters on the left hand side.  This suggests that the semi-physical model determined by the empirical identification cannot be meaningfully related to the physical model---that the model identification does not provide physically meaningful parameter estimates.  This greatly reduces the utility of the model by implying that it is only applicable to this one system under the specific operating conditions.  The lack of physical semantics in the model make it challenging (impossible?) to use the model for to approximate the dynamics of similar craft since there is no clear way to adjust the parameters based on first principles or comparisons between systems.
 
 \subsection{Nonlinear Model of Blanke}
 As reported by \cite{fossen94guidance}, this model ``retains the most important terms for steering and propulsion''.  Formulating these equations for a rudder-less vessel, the speed equation becomes
@@ -663,7 +951,12 @@ The last test is a set of step changes in speed and/or heading while executing t
 %\bibliographystyle{../latex_ieee/IEEEtran}
 \bibliographystyle{apalike}
 % argument is your BibTeX string definitions and bibliography database(s)
+
+\ifoverleaf
 \bibliography{bbing_master}
+\else
+\bibliography{../latexlib/bib/bbing_master}
+\fi
 
 %\bibliography{./latex_ieee/IEEEabrv}
 
