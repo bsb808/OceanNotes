@@ -9,13 +9,6 @@
 % Draft - single column style
 \documentclass[11pt,draftcls,journal,onecolumn]{IEEEtran}
 
-
-% For using overleaf or local compilation
-% See setting of true/false directly after \begin{document}
-\newif\ifoverleaf % default is \overleaftrue
-
-
-
 % If the IEEEtran.cls has not been installed into the LaTeX system files, 
 % manually specify the path to it:
 % \documentclass[conference]{../sty/IEEEtran} 
@@ -32,7 +25,8 @@
 \usepackage{cite}      % Written by Donald Arseneau
 \usepackage{graphicx}  % Written by David Carlisle and Sebastian Rahtz
 \usepackage{url}       % Written by Donald Arseneau
-\usepackage{amssymb,longtable,dcolumn}
+\usepackage{amsmath, amssymb, longtable, dcolumn}
+\usepackage{nccmath}  % Provides \medmath to change math size
 \usepackage{bm}
 %\usepackage{subfigure}
 %\usepackage{stfloats}  % Written by Sigitas Tolusis
@@ -50,9 +44,13 @@
 \usepackage{my_acronyms}
 \usepackage{math_bbing}
 
+% For using overleaf or local compilation
+% See setting of true/false directly after \begin{document}
+\newif\ifoverleaf % default is \overleaftrue
+
 \begin{document}
 
-\overleaftrue
+\overleaffalse
 
 \newtheorem{remark}{Remark}
 \renewcommand{\theremark}{\unskip}
