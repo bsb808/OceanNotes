@@ -1,30 +1,53 @@
-\documentclass[11pt,draftcls,journal,onecolumn]{IEEEtran}
+\documentclass[11pt, letterpaper]{article}
 
-\usepackage{cite}      % Written by Donald Arseneau
-\usepackage{graphicx}  % Written by David Carlisle and Sebastian Rahtz
-\usepackage{url}       % Written by Donald Arseneau
+% Includes
+\usepackage{acronym}
 \usepackage{amsmath, amssymb, longtable, dcolumn}
-\usepackage{nccmath}  % Provides \medmath to change math size
 \usepackage{bm}
+\usepackage{color,soul}
+\usepackage{colortbl}
+\usepackage{csvsimple}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{IEEEtrantools} % Requires sudo apt-get install texlive-publishers texlive-publishers-doc
+\usepackage{indentfirst}
+\usepackage{graphicx}
+%\usepackage{lgrind}
+\usepackage{multirow}
+\usepackage{nccmath}  % Provides \medmath to change math size
+\usepackage{pdfpages}
+\usepackage{siunitx}
+%\usepackage{subcaption}
+\usepackage[caption=false,font=footnotesize]{subfig}
 %\usepackage{subfigure}
 %\usepackage{stfloats}  % Written by Sigitas Tolusis
-\usepackage[caption=false,font=footnotesize]{subfig}
-%\usepackage{fixltx2e}
-\usepackage{colortbl}
-\usepackage{multirow}
-\usepackage{amsmath}
-\usepackage{units}
-\usepackage{acronym}
-\usepackage{csvsimple}
-\usepackage{color,soul}
 \usepackage{tabularx}
-\usepackage{times}
 \usepackage{units}
-\usepackage{siunitx}
+\usepackage{url}
+
+% Use only one of the next two
+%\usepackage{cite}
 \usepackage{natbib}
 
-% Requires sudo apt-get install texlive-publishers texlive-publishers-doc
-%\usepackage{IEEEtrantools}
+% Setup
+\newcommand{\doctitle}{CUSV Modeling}
+\addtolength{\headheight}{2em}
+\addtolength{\headsep}{1.5em}
+\lhead{\doc}
+\rhead{}
+\setcounter{secnumdepth}{4}
+\graphicspath{{images/}}
+\newcommand{\capt}[1]{\caption{\small \em #1}}
+\cfoot{\small Brian Bingham \today \\ \thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newenvironment{xitemize}{\begin{itemize}\addtolength{\itemsep}{-0.75em}}{\end{itemize}}
+\newenvironment{tasklist}{\begin{enumerate}[label=\textbf{\thesubsubsection-\arabic*},ref=\thesubsubsection-\arabic*,leftmargin=*]}{\end{enumerate}}
+
+\makeatletter
+\newcommand*{\compress}{\@minipagetrue}
 
 % For using overleaf or local compilation
 % See setting of true/false directly after \begin{document}
@@ -45,32 +68,12 @@
 % 0.4 works well for 2 column
 \newcommand{\FigWidth}{\SFb}
 
-% To prevent line break
-\newcommand{\wamv}{WAM\=/V}
-
-% Graphics for this paper
-\graphicspath{{images/}}
-
-% paper title
-%\title{Towards an Experimentally Validated Plume Model to Support Robotic Plume Characterization}
-\title{CUSV Modelling}
-
-% author names and affiliations
-% use a multiple column layout for up to three different
-% affiliations
-\author{Brian~Bingham$^{1}$% <-this % stops a space
-\thanks{$^{1}$ Self}%
-}
-
-% make the title area
-\maketitle
-
-%\begin{abstract}
-%Abstract
-%\end{abstract}
-% no keywords
-
-\IEEEpeerreviewmaketitle
+\newpage
+% Title Page
+%\setcounter{page}{1}
+\begin{center}
+{\huge \doctitle}
+\end{center}
 
 \section{Vehicle Model}
 %
@@ -92,7 +95,69 @@ are the position and velocity vectors respectively for surge, sway, heave, roll,
 
 Traditionally, surface vessel models are separated into \emph{maneuvering} models (representing the surge, sway and yaw degrees-of-freedom) and \emph{seakeeping} models (representing the heave, pitch and roll degrees-of-freedom). For the purposes of supporting the development of autonomy, it is important that the unified simulation model include \emph{both} maneuvering and seakeeping degrees-of-freedom. The maneuvering aspects of the model influence the vessel steering and control portion of the autonomy solution. The inclusion of the seakeeping aspect of the model is critical for exercising the sensory perception portion of the autonomy solution.
 
-\subsection{Hydrodynamic Forces}\label{s:hydro}
+\section{Rigid-Body Terms}
+
+We assume that the principal axis of inertia can be consider to be coincident with the center-of-mass of the vessel.  The vessel is symmetric about the $x--z$ plane (left-right symmetry), which implies that $I_{xy}=I{yx}=0$.  We also simplify by considering the vessel to be symmetric about the $x--y$ plane (top-bottom symmetry) such that $I_{xz}=0$.  The result is a diagonal inertia matrix.
+\begin{equation}
+\bm{M}_{RB}= \left[ 
+\begin{array}{ccccccc}
+m & 0 & 0 & 0 & 0 & 0 \\
+0 & m & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & I_{xx} & 0 & 0 \\
+0 & 0 & 0 & 0 & I_{yy} & 0 \\
+0 & 0 & 0 & 0 & 0 & I_{zz} 
+\end{array} \right].
+\end{equation}
+and a Coriolis-centripetal matrix
+\begin{equation}
+\bm{C}_{RB}(\bm{\nu})= \left[ 
+\begin{array}{ccccccc}
+  0 & 0 & 0 & 0 & mw & -mv \\
+  0 & 0 & 0 & -mw & 0 & mu \\
+  0 & 0 & 0 & mv & -mu & 0 \\
+  0 & mw  & -mv & 0 & I_{zz}r & -I_{yy}q \\
+  -mw & 0 & mu & -I_{zz}r & 0 & I_{xx}p \\
+  mv & -mu & 0 & I_{yy}q & -I_{xx}p  & 0
+\end{array} \right].
+\end{equation}
+
+\subsection{Parameter Estimation}
+
+\begin{itemize}
+\item Mass is calculated based on an estimate of draft, the effective length and the cross-section of a circle segment.  The value is consistent specifications of similar vessels.
+\item Moments of inertia are based on an effective cylindrical model
+\end{itemize}
+
+\begin{table}
+\renewcommand{\arraystretch}{1.3}
+\caption{Mass properties}
+\label{t:example}
+\centering
+\begin{tabular}{crll}
+  \hline \hline
+  Parameter & Value & Units & Description \\
+  \hline  \hline
+  \multicolumn{4}{c}{Given Values} \\
+  \hline
+  $L$ & 12.2 & \unit[]{m} & Length \\
+  $B$ & 3.34 & \unit[]{m} & Beam \\
+  $\rho$ & 1,024 & $\unit[]{kg/m^3}$ & Density of seawater \\
+  \hline \hline \multicolumn{4}{c}{Estimated Values} \\
+  \hline
+  $T$ & 1.2 & \unit[]{m} & Draft \\
+  \hline \hline \multicolumn{4}{c}{Calculated Values} \\
+  \hline
+  $A_{wp}$ & 35 & $\unit[]{m^2}$ & Waterplane area \\
+  $\nabla$ & 32 & $\unit[]{m^3}$ & Displaced volume \\
+  $m$ & 33,000 & $\unit[]{kg}$ & Mass \\
+  $I_{xx}$ & 20,700 & $\unit[]{kg\cdot m^s}$ & Moment of inertia, roll \\
+  $I_{yy}=I_{zz}$ & 420,000 & $\unit[]{kg\cdot m^s}$ & Moment of inertia, pitch and yaw \\
+  \hline
+\end{tabular}
+\end{table}
+
+\section{Hydrodynamic Terms}\label{s:hydro}
 %
 The hydrodynamic forces in \eqref{e:fossenmodel} include the added mass terms due to the inertia of the surrounding fluid and hydrodynamic damping terms due to the vehicle interacting with the surrounding fluid. The terms are captured using coefficients, typically referred to as hydrodynamic derivatives, and expressed using SNAME (1950) notation \citep{fossen11handbook}.
 
@@ -178,6 +243,86 @@ This approximation of the hydrodynamic effects is implemented as a parameterized
 
 % maybe this paragraph is no longer needed???
 This simplified six degree-of-freedom model and the Gazebo plugin are generally applicable to surface vessels.  Applying this model to a specific vessel requires determining values for the hydrodynamic derivatives.  These values can be approximated from first principles (e.g., potential flow theory) or estimated through experimental testing (e.g., scale model testing).  \citet{sarda16station} estimate the hydrodynamic derivatives for a three degree-of-freedom model of thevessel by manually tuning the coefficients so that the model outputs agree with experimental measurements from at-sea maneuvering tests.  Each of the of linear drag terms in  \eqref{e:D} are estimated, but only the surge term in the quadratic drag matrix \eqref{e:D_n} is identified, implying that the remaining quadratic terms are neglected.
+
+\subsection{Drag Estimate}
+
+The resistance $R$ do to any particular drag component is expressed as a drag coefficient $C_D$ were
+\[
+R = \frac{1}{2}C_D \rho S U^2
+\]
+where $S$ is the at-rest hull wetted surface and $\rho$ is the water density. The total ship drag, $C_T$ is expressed as
+\[
+C_T = C_W + (1+k) C_F
+\]
+where $C_w$ is the wve drag, $C_F$ is the frictional drag and $k$ is a form factor representing the viscous pressure drag some fraction of the frictional resistance coefficient.
+
+
+\begin{table}
+\renewcommand{\arraystretch}{1.3}
+\caption{Hull-Form/Fineness Coefficients}
+\label{t:hullform}
+\centering
+\begin{tabular}{llrl}
+  \hline \hline
+  Parameter & Symbol & Value & Units \\
+  \hline  \hline
+  \multicolumn{4}{c}{Given Values} \\
+  \hline
+  Length of waterline & $L$ & 12.2 & \unit[]{m} \\
+  Beam on waterline & $B$ & 3.34 & \unit[]{m} \\
+  \hline \hline \multicolumn{4}{c}{Estimated Values} \\
+  \hline
+  Draft &  $T$ & 1.2 & \unit[]{m} \\
+  \hline \hline \multicolumn{4}{c}{Calculated Values} \\
+  \hline
+  Waterplane area & $A_{wp}$ & 35 & $\unit[]{m^2}$  \\
+  Maximum section area & $A_X$ & 3.01 & $\unit[]{m^2}$  \\
+  Midship section area & $A_M$ & 3.01 & $\unit[]{m^2}$  \\
+  Wetted surface Area & $S$ & 51 & $\unit[]{m^2}$  \\
+  Displaced volume & $\nabla$ & 32 & $\unit[]{m^3}$ \\
+  \hline \hline \multicolumn{4}{c}{Hull-Form Coefficients} \\
+  \hline
+  Prismatic & $C_P = \frac{\nabla}{A_X L} $ & 0.875 &\\
+  Volumetric & $C_V = \frac{\nabla}{L^3} $ & 0.018 &\\
+  Maximum Section & $C_X = \frac{A_X}{BT} $ & 0.75 &\\
+  Midship Section & $C_M = \frac{A_M}{BT} $ & 0.75 &\\
+  Block & $C_B = \frac{\nabla}{LBT} $ & 0.66 &\\
+  Vertical Prismatic & $C_{PV} = \frac{\nabla}{A_{WP}T} $ & 0.75 &\\
+  Waterplane  & $C_{WP} = \frac{A_{WP}}{LB} $ & 0.875 &\\
+  & $B/T$   & 2.8 & \\
+  & $S/V^{2/3}$ & 5.1 \\
+  \hline 
+\end{tabular}
+\end{table}
+
+\begin{figure}[hbt!]
+\centering
+\includegraphics[width=0.6\linewidth]{drag_est.png}
+\caption{\cite{read09drag}}
+\label{f:drag_est}
+\end{figure}
+
+
+Holtrop's method suggests that the fritctional drag component can be neglected for normal  \cite{holtrop82approximate,holtrop84statistical}
+
+\begin{itemize}
+\item Assume a Froude number between $Fr=0.2--0.3$, which is $U=\unit[2.2--3.3]{m/s}$.
+\item Figure~\ref{f:drag_est} suggests $C_w \approx \num{1.0e-3}$.
+\item Using Holtrop's method \cite{holtrop82approximate,holtrop84statistical}, we calculate $(1+k) = 1.76$
+  \item Using ITTC 1957 line/method $C_F = \frac{0.075}{(log_{10}(Re)-2)^2}$ suggest that  $C_w \approx \num{2.0e-3}$ which is consistent with the guideline that the majority of the hull's total resistance is due to water friction at slow speeds.
+  \end{itemize}
+The result is $C_T = \num{4.5e-3}$, the total resistance force is
+\[
+R = \frac{1}{2}C_T \rho S U^2  = 118.0 U^2
+\]
+So
+\begin{itemize}
+\item $X_u = 0$
+\item $X_{u|u|}=\unit[118.0]{N/(m/s)^2}$
+  \end{itemize}
+
+
+
 
 \bibliographystyle{apalike}
 
