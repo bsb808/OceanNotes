@@ -26,6 +26,7 @@
 \usepackage{tabularx}
 \usepackage{units}
 \usepackage{url}
+\usepackage{array}
 
 % Use only one of the next two
 %\usepackage{cite}
@@ -97,13 +98,13 @@ Traditionally, surface vessel models are separated into \emph{maneuvering} model
 
 \section{Rigid-Body Terms}
 
-We assume that the principal axis of inertia can be consider to be coincident with the center-of-mass of the vessel.  The vessel is symmetric about the $x--z$ plane (left-right symmetry), which implies that $I_{xy}=I{yx}=0$.  We also simplify by considering the vessel to be symmetric about the $x--y$ plane (top-bottom symmetry) such that $I_{xz}=0$.  The result is a diagonal inertia matrix.
+We assume that the principal axis of inertia can be consider to be coincident with the center-of-mass of the vessel.  The vessel is symmetric about the $x-z$ plane (left-right symmetry), which implies that $I_{xy}=I{yx}=0$.  We also simplify by considering the vessel to be symmetric about the $x-y$ plane (top-bottom symmetry) such that $I_{xz}=0$.  The result is a diagonal inertia matrix.
 \begin{equation}
 \bm{M}_{RB}= \left[ 
 \begin{array}{ccccccc}
 m & 0 & 0 & 0 & 0 & 0 \\
 0 & m & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & m & 0 & 0 & 0 \\
 0 & 0 & 0 & I_{xx} & 0 & 0 \\
 0 & 0 & 0 & 0 & I_{yy} & 0 \\
 0 & 0 & 0 & 0 & 0 & I_{zz} 
@@ -233,18 +234,10 @@ and
   }
 \end{equation}
 
-As discussed in \citet{fossen11handbook}, for a surface vehicle, the linear damping matrix captures predominately two effects, viscous skin-friction damping and potential damping. In the maneuvering degrees-of-freedom, the viscous component of the linear damping term becomes the dominant damping contribution for vehicles traveling at low speed. In the seakeeping degrees of freedom the radiation-induced potential damping component is important because these motion components by a surface vehicle produce significant radiated waves. The potential damping for these degrees-of-freedom is important regardless of the forward speed. Unlike the horizontal plane, the vertical plane motions have restoring forces or moments and consequently occur at their natural frequencies which affects the speed of these motions more than the vehicle forward speed.
-
-Our linear damping matrix, $\bm{D}_l$, contains terms to capture both of these effects. The maneuvering degrees-of-freedom terms, $X_{u}$, $Y_{v}$, and $N_{r}$, capture the low-speed skin-friction damping the vehicle experiences and were included in the linear damping matrix used by \citet{sarda16station}. To estimate these terms we use the theoretical expressions presented by them. Their model also contained the off-diagonal terms, $Y_{r}$ and $N_{v}$. Since we are utilizing their model we also include those terms and use the expressions they provided to estimate them. The remaining maneuvering off-diagonal terms are assumed to be negligible. The seakeeping degrees-of-freedom terms, $Z_{w}$, $K_{p}$, and $M_{q}$, capture the radiation-induced potential damping the vehicle experiences. To estimate these terms we used the potential damping results from \citet{greenhow88added} for a heaving partially submerged horizontal cylinder. The roll and pitch damping values assumed that half this damping occurred at the same length scales as used for the added mass estimates. All the seakeeping off-diagonal terms should be negligible and are not included in our model.
-
-\citet{fossen11handbook} also highlighted that for a surface vehicle the nonlinear damping matrix, with its cross-flow damping terms, becomes the dominant damping contribution at high speed for the maneuvering degrees-of-freedom. Since we want our vehicle model to represent the behavior of a wide range of surface vehicles and operating conditions, we have included these nonlinear damping terms in our unified model. However, since the vehicle  is predominately a low speed vehicle, when we apply our unified model specifically, we set the $Y_{v|v|}$ and $N_{r|r|}$ terms to zero. We also normally set $X_{u|u|}$ to zero.
-
 This approximation of the hydrodynamic effects is implemented as a parameterized Gazebo plugin.  The user defines the characteristics of the vessel under test through a vessel-specific configuration file that includes the hydrodynamic derivatives.  During each time step of the simulation, the plugin is executed with access to the state of the vessel and environment.  The hydrodynamic force terms in \eqref{e:fossenmodel} are calculated based on this state information and the user-defined vessel characteristics.  The resulting force and moment values are then applied to the vessel through the Gazebo application programming interface (API) for inclusion in the next iteration of the physics engine.
 
-% maybe this paragraph is no longer needed???
-This simplified six degree-of-freedom model and the Gazebo plugin are generally applicable to surface vessels.  Applying this model to a specific vessel requires determining values for the hydrodynamic derivatives.  These values can be approximated from first principles (e.g., potential flow theory) or estimated through experimental testing (e.g., scale model testing).  \citet{sarda16station} estimate the hydrodynamic derivatives for a three degree-of-freedom model of thevessel by manually tuning the coefficients so that the model outputs agree with experimental measurements from at-sea maneuvering tests.  Each of the of linear drag terms in  \eqref{e:D} are estimated, but only the surge term in the quadratic drag matrix \eqref{e:D_n} is identified, implying that the remaining quadratic terms are neglected.
 
-\subsection{Drag Estimate}
+\subsection{Drag Estimates}
 
 The resistance $R$ do to any particular drag component is expressed as a drag coefficient $C_D$ were
 \[
@@ -254,7 +247,7 @@ where $S$ is the at-rest hull wetted surface and $\rho$ is the water density. Th
 \[
 C_T = C_W + (1+k) C_F
 \]
-where $C_w$ is the wve drag, $C_F$ is the frictional drag and $k$ is a form factor representing the viscous pressure drag some fraction of the frictional resistance coefficient.
+where $C_w$ is the wave drag, $C_F$ is the frictional drag and $k$ is a form factor representing the viscous pressure drag some fraction of the frictional resistance coefficient.
 
 
 \begin{table}
@@ -303,7 +296,7 @@ where $C_w$ is the wve drag, $C_F$ is the frictional drag and $k$ is a form fact
 \end{figure}
 
 
-Holtrop's method suggests that the fritctional drag component can be neglected for normal  \cite{holtrop82approximate,holtrop84statistical}
+Holtrop's method suggests that the frictional drag component can be neglected for normal  \cite{holtrop82approximate,holtrop84statistical}
 
 \begin{itemize}
 \item Assume a Froude number between $Fr=0.2--0.3$, which is $U=\unit[2.2--3.3]{m/s}$.
@@ -313,16 +306,107 @@ Holtrop's method suggests that the fritctional drag component can be neglected f
   \end{itemize}
 The result is $C_T = \num{4.5e-3}$, the total resistance force is
 \[
-R = \frac{1}{2}C_T \rho S U^2  = 118.0 U^2
+R = \frac{1}{2}C_T \rho S U^2  = (118.0) \, U^2
 \]
 So
 \begin{itemize}
 \item $X_u = 0$
 \item $X_{u|u|}=\unit[118.0]{N/(m/s)^2}$
-  \end{itemize}
+\item If similarity to VRX model holds, then
+  \begin{itemize}
+  \item  $Y_{u|u|}= 11.4 \cdot X_{u|u|} = \unit[1345.0]{N/(m/s)^2}$
+  \item  $Z_{v|v|}= 31.2 \cdot X_{u|u|} = \unit[3680.0]{N/(m/s)^2}$
+  \end{itemize}  
+\end{itemize}
+
+\section{Summary}
+
+\begin{table}
+\renewcommand{\arraystretch}{1.3}
+\caption{Model Parameters}
+\label{t:params}
+\centering
+\begin{tabular}{>{\raggedright}p{0.18\linewidth}
+  >{\raggedright}p{0.2\linewidth}
+  rl
+  >{\raggedright}p{0.25\linewidth}}%{p{1.5in}p{1.5in}rlp{1.5in}}
+  \hline \hline
+  Parameter & Description & Value & Units & Method \tabularnewline
+  \hline
+  $m$ & Mass & 33,000 & $\unit[]{kg}$ & Displacement estimate based on geometry \tabularnewline
+  $I_{xx}$ & MOI-roll & 20,700 & $\unit[]{kg\cdot m^s}$ & Effective cylinder\tabularnewline
+  $I_{yy}=I_{zz}$ & MOI-pitch/yaw & 420,000 & $\unit[]{kg\cdot m^s}$ & Effective cylinder \tabularnewline
+  $X_{\dot{u}}$ & Added mass, surge & 0 & $\unit[]{kg}$ & Neglected \tabularnewline
+  $Y_{\dot{v}}$ & Added mass, sway  & 26,000 & $\unit[]{kg}$ & Cylinder \cite{greenhow88added} \tabularnewline
+  $Z_{\dot{w}}$ & Added mass, heave  & 31,000 & $\unit[]{kg}$ & Cylinder \cite{greenhow88added} \tabularnewline
+  $K_{\dot{p}}=M_{\dot{q}}=N_{\dot{r}}=Y_{\dot{r}}=N_{\dot{v}}=$ & Added mass, roll/pitch/yaw   & 0 & $\unit[]{kg \cdot m^2}$ & Neglected \tabularnewline
+  $X_{u}=0$ & Drag, linear, surge & 0 & $\unit[]{N/(m/s)}$ &  \cite{holtrop82approximate,holtrop84statistical,read09drag} \tabularnewline
+  $X_{u|u|}$ & Drag, quadratic, surge & 118 & $\unit[]{N/(m/s)^2}$ &   \cite{holtrop82approximate,holtrop84statistical,read09drag} \tabularnewline
+  $Y_{v}=0$ & Drag, linear, sway & 0 & $\unit[]{N/(m/s)}$ & Proportional to VRX model \tabularnewline
+  $Y_{v|v|}$ & Drag, quadratic, sway & 1345 & $\unit[]{N/(m/s)^2}$ &  Proportional to VRX model \tabularnewline
+$K_{p}, \, K_{p|p}, \, M_{q}$, $M_{q|q|}, \, N_{r}, \, N_{r|r|}$ & Drag & Various & & SIT  \tabularnewline
+  \hline
+\end{tabular}
+\end{table}
+
+\section{Frequency Domain Model}
+
+Deduced from time-domain model via step response tests.  Identification of second-order transfer function parameters via logarithmic decrement.
 
 
+\begin{table}
+\renewcommand{\arraystretch}{1.2}
+\caption{Frequency domain system parameters}
+\label{t:freq}
+\centering
+\begin{tabular}{llrl}
+  \hline \hline
+  Parameter & Symbol & Value & Units \\
+  \hline  \hline
+  \multicolumn{4}{c}{Heave: Figure~\ref{f:h}} \\
+  \hline
+  Period & $T$ & 2.0 & $\unit[]{s}$ \\
+  Damping ratio & $\zeta$ & 0.13 & n/a \\
+  Undamped natural freq.  & $\omega_n$ & 3.19 & $\unit[]{rad/s}$ \\
+  Damped natural freq.  & $\omega_d$ & 3.16 & $\unit[]{rad/s}$ \\
+  \hline \hline \multicolumn{4}{c}{Pitch: Figure~\ref{f:p}} \\
+  \hline
+  Period & $T$ & 1.6 & $\unit[]{s}$ \\
+  Damping ratio & $\zeta$ & 0.14 & n/a \\
+  Undamped natural freq.  & $\omega_n$ & 4.08 & $\unit[]{rad/s}$ \\
+  Damped natural freq.  & $\omega_d$ & 4.04 & $\unit[]{rad/s}$ \\
+  \hline \hline \multicolumn{4}{c}{Roll: Figure~\ref{f:r}} \\
+  \hline
+  Period & $T$ & 0.63 & $\unit[]{s}$ \\
+  Damping ratio & $\zeta$ & 0.021 & n/a \\
+  Undamped natural freq.  & $\omega_n$ & 9.92 & $\unit[]{rad/s}$ \\
+  Damped natural freq.  & $\omega_d$ & 9.92 & $\unit[]{rad/s}$ \\
+\end{tabular}
+\end{table}
 
+\begin{figure}[hbt!]
+\centering
+\includegraphics[width=0.6\linewidth]{./src/usv_param_est/heave_step.png}
+\caption{Heave step response}
+\label{f:h}
+\end{figure}
+
+\begin{figure}[hbt!]
+\centering
+\includegraphics[width=0.6\linewidth]{./src/usv_param_est/pitch_step.png}
+\caption{Pitch step response}
+\label{f:p}
+\end{figure}
+
+\begin{figure}[hbt!]
+\centering
+\includegraphics[width=0.6\linewidth]{./src/usv_param_est/roll_step.png}
+\caption{Roll step response}
+\label{f:r}
+\end{figure}
+
+
+\clearpage
 
 \bibliographystyle{apalike}
 
