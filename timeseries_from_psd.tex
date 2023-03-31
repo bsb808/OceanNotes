@@ -163,7 +163,7 @@ Consider a zero-mean, real-valued, wide-sense stationary\footnote{Wide-sense sta
 \[
 R_{xx}(\tau) = E[x(t+\tau)x(t)] 
 \]
-where $E(\cdot)$ is the expectation operator. Under reasonable assumption so continuity and differentiability, the autocorrelation and power spectral density (PSD) are Fourier transform pairs.  In units of oscillation frequency this is expressed as
+where $E(\cdot)$ is the expectation operator. Under reasonable assumptions of continuity and differentiability, the autocorrelation and power spectral density (PSD) are Fourier transform pairs.  In units of oscillation frequency this is expressed as
 \begin{IEEEeqnarray}{rClCl}
   \IEEEyesnumber\label{e:ewkf} \IEEEyessubnumber*
   S_{xx}(f) & = & \int_{-\infty}^{\infty}R_{xx}(\tau)e^{-j (2 \pi f) \tau}d\tau & = & \mathcal{F}\{R_{xx}(\tau)\} \\
@@ -235,9 +235,10 @@ The frequency sampling is $\Delta\omega$, the upper cut-off frequency, $\omega_u
 and to avoid aliasing the time step (sampling time) is constrained by
 \begin{IEEEeqnarray}{rCl}
 \IEEEyesnumber\label{e:deltat} \IEEEyessubnumber*
-\Delta t & \leq & \frac{2 \pi}{ 2 \omega_u} \\
-& \leq & \frac{1}{2} \left( \frac{2 pi}{\Delta \omega} \right) \frac{1}{N}\\
-& \leq & \frac{1}{2} \left( \frac{1}{\Delta f} \right) \frac{1}{N}
+\Delta t & \leq & \frac{2 \pi}{ 2 \omega_u} = \frac{\pi}{\omega_u}\\
+& \leq & \frac{1}{2} \left( \frac{2 \pi}{\Delta \omega} \right) \frac{1}{N} = 
+\frac{\pi}{\Delta \omega \, N}\\
+& \leq & \frac{1}{2} \left( \frac{1}{\Delta f} \right) \frac{1}{N} = \frac{1}{2 \, \Delta f \, N}
 \end{IEEEeqnarray}
 with the sampling frequency expressed as both angular and oscillation frequencies. The condition
 \begin{equation}

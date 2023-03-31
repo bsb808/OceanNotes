@@ -1,5 +1,9 @@
 \documentclass[11pt]{article}
 %\usepackage[firstpage]{draftwatermark}
+
+\usepackage{url,hyperref,lineno,microtype,subcaption}
+\usepackage[onehalfspacing]{setspace}
+
 \usepackage{times}
 \usepackage{pdfpages}
 \usepackage{fullpage}
@@ -210,8 +214,7 @@ True target strength in water depends on a variety of parameters such as specula
 % The background of modeling the beam pattern is covered by the following:
 % \begin{itemize}
 % \item \href{http://www.personal.psu.edu/faculty/m/x/mxm14/}{Martin Mazur's} 2012 Underwater Acoustics (Penn State) \href{http://www.personal.psu.edu/faculty/m/x/mxm14/sonar/Mazur-sonar_signal_processing_combined.pdf}{course notes}.
-% \item John Leonard's \href{https://ocw.mit.edu/courses/mechanical-engineering/2-011-introduction-to-ocean-science-and-engineering-spring-2006/readings/hw5_sonar_leonar.pdf}{Introduction to Sonar} from Alex Techet's 2006 Introduction to Ocean Science and Engineering \href{https://ocw.mit.edu/courses/mechanical-engineering/2-011-introduction-to-ocean-science-and-engineering-spring-2006/}{course notes}.
-% \item \href{https://www3.mbari.org/data/mbsystem/sonarfunction/SeaBeamMultibeamTheoryOperation.pdf}{SeaBeam Multibeam Sonar Theory of Operation}.
+% \item John Leonard's \href{https://ocw.mit.edu/courses/mechanical-engineering/2-011-introduction-to-ocean-science-and-engineering-spring-2006/readings/hw5_sonar_leonar.pdf}{Introduction to Sonar} from Alex Techet's 2006 Introduction to Ocean Science and Engineering \href{https://ocw.mit.edu/courses/mechanical-engineering/2-011-introduction-to-ocean-science-and-engineering-spring-2006/}{course notes% \item \href{https://www3.mbari.org/data/mbsystem/sonarfunction/SeaBeamMultibeamTheoryOperation.pdf}{SeaBeam Multibeam Sonar Theory of Operation}.
 % \end{itemize}
 \subsection{Single Beam Sonar Model}
 A single sonar beam is modeled using discrete rays. The individual rays are indexed as $i=\{1, 2, ... N\}$ for $N$ rays. The following information is generated for each ray within an individual beam:
