@@ -26,14 +26,14 @@
 
 \author{Brian Bingham}
 \rank{Professor, Mechanical and Aerospace Engineering Department}  
-\degreedate{April 2023}
+\degreedate{1 April 2023}
 
 % Match to your thesis dashboard
 \distribution{Approved for public release. Distribution is unlimited.}
 
 % Paste abstract from your thesis dashboard. New paragraphs start after an empty line.
 \abstract{
-Simulating sample functions of a stochastic process defined by a power spectral density is theoretically well defined and a variety of methods are available, most common are the summation of cosines and fast Fourier transform (FFT) approaches.  Applying the mathematical theory to physical phenomena depends crucially on the conventions used in the mathematical definitions, normalization and scaling and appropriate use of one and two-sided spectra.  This report synthesizes the basic mathematical background, presented with the intent of providing a self-consistent set of conventions for the practitioner.  We also present a complete example in MATLAB to demonstrate the important details of considering scaling, units and sidedness.
+Simulating sample functions of a stochastic process defined by a power spectral density is theoretically well defined and a variety of methods are available, most common are the summation of cosines and fast Fourier transform (FFT) approaches.  Applying the mathematical theory to physical phenomena crucially depends on the conventions used in the mathematical definitions, normalization and scaling and appropriate use of one and two-sided spectra.  This report synthesizes the basic mathematical background, presented with the intent of providing a self-consistent set of conventions for the practitioner.  We also present a complete example in MATLAB to demonstrate the important details of considering scaling, units and sidedness.
 }
 
 % If CUI (Controlled Unclassified Information)
@@ -45,28 +45,28 @@ Simulating sample functions of a stochastic process defined by a power spectral 
 %
 % Mandatory fields for the SF298.
 %
-\ReportType{Technical Report}
-\ReportDate{April 2023}       % for a thesis, graduation date
-\SponsoringAgency{Naval Postgraduate School}   
-\DatesCovered{01-01-2021 to 04-01-2023}
-\ReportClassification{Unclassified}
-\AbstractClassification{Unclassified}
-\PageClassification{Unclassified}
+\ReportType{Technical}
+\ReportDate{1 April 2023}       % for a thesis, graduation date
+\SponsoringAgency{Naval Postgraduate School \\ Monterey, CA 93943}   
+\DatesCovered{1 JAN 2023 to 1 APR 2023}
+\ReportClassification{U}
+\AbstractClassification{U}
+\PageClassification{U}
 %
 % Optional fields for the SF298.
 %
-\RPTpreparedFor{}
+\RPTpreparedFor{Naval Postgraduate School}
 \ContractNumber{}
 \GrantNumber{}
 \ProgramElementNumber{}
 \TaskNumber{}
 \WorkUnitNumber{}
-\POReportNumber{}
+\POReportNumber{NPS-MAE-23-002}
 \Acronyms{}
 \SMReportNumber{}
-\SubjectTerms{}
-\ResponsiblePerson{}
-\RPTelephone{}
+\SubjectTerms{timeseries, stocastic processes, simulation, spectral representation, wave generation}
+\ResponsiblePerson{Brian Bingham}
+\RPTelephone{(831) 200-6360}
 \SignatureOne{}
 \SignatureTwo{}
 \SupplementaryNotes{The views expressed in this document are those of the author and do not reflect the official policy or position of the Department of Defense or the U.S. Government.
@@ -85,7 +85,11 @@ Simulating sample functions of a stochastic process defined by a power spectral 
 % Comment out if you have build problems building with hyperref
 \NPShyperref
 
-
+% For signature page
+\researchchair{Kevin A. Smith}
+\departmentchair{Jomana Amara}
+\department{Vice Provost of Academic Leadership}
+%\SponsoringNotation{}
 %
 % Your thesis begins here
 %
@@ -95,7 +99,7 @@ Simulating sample functions of a stochastic process defined by a power spectral 
 %\bstctlcite{forced-et-al-off}
 \NPScover                  % Cover page
 \NPSsftne                  % SF298 form
-%\NPSsignature             % Tech Report page (iii): signature page
+\NPSsignature             % Tech Report page (iii): signature page
 %\NPSthesistitle            % Thesis page (iii): title page
 \NPSabstractpage           % Abstract Page
 %\NPSfrontmatter            % NPS front matter follows
@@ -125,7 +129,7 @@ Simulating sample functions of a stochastic process defined by a power spectral 
 \NPSbody
 
 \section{Introduction}
-Many of the environmental influences on an engineered system can be modeled as stochastic processes where the particular environmental conditions are described by the power spectrum density of the process.  For maritime vessels waves and wind have important influences on control and perception.  Using spectral representations of these influences improves the connection between the simulated environment and field conditions.  This study is motivated by our recent work in simulation of environmental influences upon ocean robotic systems at and below the water surface \cite{bingham2019maritime, zhang22dave, choi22fasterrohtua}.
+Many of the environmental influences on an engineered system can be modeled as stochastic processes where the particular environmental conditions are described by the power spectrum density of the process.  For maritime vessels, waves and wind have important influences on control and perception.  Using spectral representations of these influences improves the connection between the simulated environment and field conditions.  This study is motivated by our recent work in simulation of environmental influences upon ocean robotic systems at and below the water surface \cite{bingham2019maritime, zhang22dave, choi22fasterrohtua}.
 
 As pointed out in \cite{barbour15normalization} the variety of nomenclature, conventions and definitions in spectral analysis leads to considerable confusion and often improper use when applying these powerful techniques.
 
@@ -134,7 +138,8 @@ Methods for simulation of stochastic process include convariance decomposition, 
 
 
 \subsection{Background}
-Original work on spectral representation of a stochastic process \cite{rice44mathematical1,rice45mathematical2}.  Some of the original approaches to generating a time series with given PSD were based the design of a linear filter for which white noise input would generate an output with the desired PSD.  Introduced sum of cosines \cite{borgman69ocean, shinozuka72monte}.  Methods:
+Foundational work on spectral representation of a stochastic process was done by 
+ Rice \cite{rice44mathematical1,rice45mathematical2}.  Some of the original approaches to generating a time series with given PSD were based the design of a linear filter for which white noise input would generate an output with the desired PSD.  Introduced sum of cosines \cite{borgman69ocean, shinozuka72monte}.  The methods covered in this reporot include the following:
 \begin{itemize}
 \item Linear filtering and spectral factorization.
 \item Spectral representation - sum of cosines
@@ -151,7 +156,7 @@ Our goal is to generate time series realizations of stochastic processes describ
 \item Scaling of the Fourier transform and Fourier series resulting from the choice of frequency units.
 \item Use of the two-sided or one-sided PSD.
 \end{itemize}
-These issues are not of primary importance in mathematics and physics domains, or in applications where both the transform and inverse transform are used.  For our engineering applications, maintaining the physical relevance between the expression of the PSD (in either frequency units and either sidedness) and the time series with physically meaningful units is important.  One of the primary contributions of this report is to provide a complete and consistent synthesis of the simulation generation process with explicit notation to make use of the various conventions for expressing PSD sidedness, frequency units and Fourier transform scaling.
+Often the details of the conventions used are ambiguous because these issues are not of primary importance in mathematics and physics domains, or in applications where both the transform and inverse transform are used.  However, for our engineering applications, maintaining the physical relevance between the expression of the PSD (in either frequency units and either sidedness) and the time series with physically meaningful units is important for the purposes of generating environmental influences that are statistically representative of the underlying spectral descriptions.  The contribution of this report is to provide a complete and consistent synthesis of the simulation generation process with explicit notation to make use of the various conventions for expressing PSD sidedness, frequency units and Fourier transform scaling.
 
 
 \section{Preliminaries}
@@ -196,7 +201,7 @@ which is similar to the Fourier-Stieltjes transform used commonly in probability
 
 
 \subsubsection{Einstein-Wiener-Khinchin Theorem}
-The theorem ``states that the autocorrelation function of a wide-sense-stationary random process has a spectral decomposition given by the power spectrum of that process''\footnote{\url{https://en.wikipedia.org/wiki/Wiener-Khinchin_theorem}}.
+The theorem states that,  ``the autocorrelation function of a wide-sense-stationary random process has a spectral decomposition given by the power spectrum of that process''\footnote{\url{https://en.wikipedia.org/wiki/Wiener-Khinchin_theorem}}.
 
 
 Consider a zero-mean, real-valued, wide-sense stationary\footnote{Wide-sense stationarity is a weaker form of strict sense stationarity.  For a wide-sense stationary stochastic process the mean and the autocorrelation are time invariant - and the energy is finite.} $x(t)$.  The autocorrelation is defined as
@@ -453,7 +458,7 @@ To verify that the generated sample functions are consistent with the original t
 \end{figure}
 The figure illustrates that both time series have equivalent estimated PSDs and that they approximate the target PSD.  The FFT method ran $\approx 60$ times faster than the summation of cosines method: \unit[0.14]{s} vs. \unit[0.0024]{s}.  Repeating the tests various values for $M$ suggests that the speed-up ratio for the FFT method is $T_{soc}/T_{fft} = 0.04 \, M$ where $T_{soc}/T_{fft}$ is the ratio of computation time for the summation of cosines method vs. the FFT method.
 
-
+The source code for this example is here: \url{https://github.com/bsb808/OceanNotes/tree/master/src/gen_timeseries_from_psd}.
 
 % REFERENCES
 % List all your BibTeX reference source files (ending in *.bib extension)
