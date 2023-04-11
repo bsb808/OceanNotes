@@ -657,12 +657,12 @@
 }
 
 % Provide reasonable defaults
-\department{Mechanical and Aerospace Engineering}
+\department{Computer Science}
 \departmentchair{Brian Bingham}
 \researchchair{Kevin B. Smith}
-\president{Ann Rondeau}
+\president{Ann E. Rondeau}
 \provost{Scott Gartner}
-\viceprovost{Jomana Amara}
+\viceprovost{Jomana H. Amara}
 \memberOne[\@@thesisadvisor]{\@thesisadvisor}
 \memberTwo[\@committeechair]{\@committeechair}
 \memberThree{}
