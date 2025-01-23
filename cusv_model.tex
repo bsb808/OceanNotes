@@ -56,7 +56,8 @@
 
 \begin{document}
 
-\overleaffalse
+% Comment out the next line if running on overleaf
+%\overleaffalse
 
 % set the figure default size
 \newcommand{\SF}{0.2}
@@ -73,7 +74,9 @@
 % Title Page
 %\setcounter{page}{1}
 \begin{center}
-{\huge \doctitle}
+{\huge \doctitle} \\
+{\Large 1 October 2020} \\
+\url{https://github.com/bsb808/OceanNotes/commits/master/cusv_model.tex}
 \end{center}
 
 \section{Overview}
@@ -539,11 +542,13 @@ The source for generating the analysis and figures is in the \verb+leanis_analys
 
 \bibliographystyle{apalike}
 
-\ifoverleaf
 \bibliography{bbing_master}
-\else
-\bibliography{../latexlib/bib/bbing_master}
-\fi
+
+%\ifoverleaf
+%\bibliography{bbing_master, ocean_notes}
+%\else
+%\bibliography{../latexlib/bib/bbing_master}
+%\fi
 
 \end{document}
 
