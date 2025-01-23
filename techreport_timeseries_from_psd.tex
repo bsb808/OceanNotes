@@ -30,9 +30,7 @@
 
 % Paste abstract from your thesis dashboard. New paragraphs start after an empty line.
 \abstract{
-Simulation provides a virtual environment to support development engineering system through test and evaluation in variety of environmental conditions. In order to provide quantitative results, the simulated environmental conditions must be derived from accurate descriptions of the physical environment, which are often described as stochastic processes.   For example, authentic synthetic wind and wave environments are an important part of evaluating ship designs.  For these sythetic environments to accurately represent they physical operating environment they must be statistically consistent with the cooresponding oceanographic and meteorological stochastic descriptions.
-\\ \\Because physical environments are often described as stocastic processes and defined by power spectral density functions, generating physically meaningful sythetic environments requires generating sample functions of the underlying power spectra.  While the relationship between a spectral description and a time series sampled from that description is mathematically well defined, applying these methods to generate physical processes requires attention to the details of spectra normalization scaling, engineering unit conventions and sidedness of the spectral representation.  
-\\ \\This report synthesizes the basic mathematical background, presented with the intent of providing a self-consistent set of conventions for the practitioner.  Two common methods for time series generate are described, summation of cosines and fast Fourier transforms along with a complete example in MATLAB to illustrate the important details of considering scaling, units and sidedness.
+Physics-based simulation is a critical capability for engineering design because it enables evaluating early-stage prototypes through testing in a variety of virtual environmental conditions.  To provide quantitative results, the simulated conditions must be derived from accurate descriptions of the physical environment.  Such environments are often modeled as stochastic processes and described by power spectral density functions, e.g., empirical wind and wave spectra.  While the relationship between a spectral description and a time series sampled from that description is mathematically well defined, generating sample time series consistent with the physical description requires attention to the details of spectra normalization scaling, engineering unit conventions and sidedness of the spectral representation.  This report synthesizes the basic mathematical background, presented with the intent of providing a self-consistent set of conventions for the practitioner.   A reference implementation is provided, implementing both summation of cosines and fast Fourier transform methods,  to illustrate the importance of accounting for  scaling, units and sidedness when generating synthetic virtual environments.
 }
 
 % If CUI (Controlled Unclassified Information)
@@ -132,6 +130,9 @@ Simulation provides a virtual environment to support development engineering sys
 \NPSbody
 
 \section{Introduction}
+
+
+
 Many of the environmental influences on an engineered system can be modeled as stochastic processes where the particular environmental conditions are described by the \ac{psd} of the process.  For maritime vessels, waves and wind have important influences on control and perception.  Using spectral representations of these influences improves the connection between the simulated environment and field conditions.  This study is motivated by our recent work in simulation of environmental influences upon ocean robotic systems at and below the water surface \cite{bingham2019maritime, zhang22dave, choi22fasterrohtua}.
 
 As pointed out in \cite{barbour15normalization} the variety of nomenclature, conventions and definitions in spectral analysis leads to considerable confusion and often improper use when applying these techniques.
@@ -465,7 +466,7 @@ The source code for this example is here: \url{https://github.com/bsb808/OceanNo
 
 
 \section{Conclusion}
-This report documents the implementation details necessary to generate time series samples of physical processes described via an empirical \ac{psd}. It is import to maintain consistency with the scaling and conventions employed in order to generate synthetic samples statistically representative of the target phenomena.  Theses details are put into practice in MATLAB reference implementation to illustrate both summation of cosines and FFT methods to generate equivalent time series and then show that the simulated time series are statistically representative of the underlying \ac{psd}.
+This report documents the implementation details necessary to generate time series samples of physical processes described via an empirical \ac{psd}. It is import to maintain consistency with the scaling and conventions employed in order to generate synthetic samples statistically representative of the target phenomena.  These details are put into practice in a MATLAB reference implementation to illustrate both summation of cosines and FFT methods for generating equivalent time series and to show that the simulated time series are statistically representative of the underlying \ac{psd}.
 
 
 % REFERENCES
