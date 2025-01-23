@@ -57,7 +57,7 @@
 \begin{document}
 
 % Comment out the next line if running on overleaf
-%\overleaffalse
+\overleaffalse
 
 % set the figure default size
 \newcommand{\SF}{0.2}
@@ -542,13 +542,13 @@ The source for generating the analysis and figures is in the \verb+leanis_analys
 
 \bibliographystyle{apalike}
 
-\bibliography{bbing_master}
+%\bibliography{bbing_master}
 
-%\ifoverleaf
-%\bibliography{bbing_master, ocean_notes}
-%\else
-%\bibliography{../latexlib/bib/bbing_master}
-%\fi
+\ifoverleaf
+\bibliography{bbing_master, ocean_notes}
+\else
+\bibliography{../latexlib/bib/bbing_master}
+\fi
 
 \end{document}
 
